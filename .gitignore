@@ -1,0 +1,8 @@
+/templates_c/*
+/html/static/*
+/vendor/*
+.svn/
+/composer.*
+/howto.*
+/src/customs.inc.php
+/custom

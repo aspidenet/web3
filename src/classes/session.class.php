@@ -1,0 +1,261 @@
+<?php
+//  
+// Copyright (c) ASPIDE.NET. All rights reserved.  
+// Licensed under the GPLv3 License. See LICENSE file in the project root for full license information.  
+//  
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+
+
+class Session {
+    private $vars;
+    public $smarty;
+    function __construct() {
+        $this->vars = array();
+        
+        $this->smarty = new Smarty;
+        $this->smarty->template_dir = array(
+        
+            BASE_DIR."/../web3-".get("CUSTOM_CODE", CUSTOM_CODE)."/src/templates",
+            BASE_DIR."/src/templates",
+        );
+        $this->smarty->compile_dir =  BASE_DIR."/templates_c";
+        
+        $this->smarty->registerPlugin("modifier",'base64_encode',  'base64_encode');
+        
+        #$this->smarty->cache_dir = "cache";
+        #$this->smarty->config_dir = "configs";
+        #$this->smarty->debug = true;
+    }
+    
+    public function get($varname, $default=false) {
+        if (isset($this->vars[$varname]))
+            return $this->vars[$varname];
+        elseif (isset($_SESSION[$varname]))
+            return $_SESSION[$varname];
+        return $default;
+    }
+    
+    public function set($varname, $value, $sess=true) {
+        $this->vars[$varname] = $value;
+        if ($sess)
+            $_SESSION[$varname] = $value;
+    }
+    
+    public function save() {
+        $_SESSION['SESSION'] = serialize($this);
+    }
+    
+    public function user() {
+        if (isset($_SESSION['USER']))
+            $user = unserialize($_SESSION['USER']);
+        else
+            $user = new User();
+        return $user;
+    }
+    
+    public function smarty() {
+        return $this->smarty;
+    }
+    
+    public function log($text) {
+        if (is_object($text))
+            error_log(var_export($text, true));
+        elseif (is_array($text))
+            error_log(var_export($text, true));
+        else
+            error_log($text);
+    }
+    
+    public function checkLogin() {
+        if (isset($_SESSION['SSO']) || isset($_SESSION['USER']))
+            return true;
+        return false;
+    }
+    
+    public function assertLogin($url=null) {
+        if (!$this->checkLogin()) {
+            if ($url)
+                $this->set("REDIRECT_URL_AFTER_LOGIN", $url, true);
+            $this->redirect(ROOT_DIR."/login");
+        }
+    }
+    
+    ################################################################################
+    # checkBearer:
+    ################################################################################
+    public function checkBearer() {
+        $db = getDB();
+        
+        $headers = apache_request_headers();#$request->headers();
+        $token = str_replace("Bearer ", "", $headers["Authorization"]);
+        
+        # TODO estrarre username dal token
+        $decifrato = openssl_decipher($token);
+        $data = substr($decifrato, 0, 8);
+        $username = substr($decifrato, 8, strlen($decifrato));
+        if (date("Ymd") != $data)
+            return false;
+        
+        $sql = "SELECT username
+                FROM Users
+                WHERE username=? AND flag_active='S'";
+        $rs = $db->Execute($sql, array($username));
+        
+        if ($rs->RecordCount() == 1)
+            return $username;
+        return false;
+    }
+
+    ################################################################################
+    # assertBearer:
+    ################################################################################
+    public function assertBearer() {
+        $check = $this->checkBearer();
+        
+        if ($check === false) {
+            header("HTTP/1.1 401 Unauthorized");
+            $result = [ 
+                "code" => 401,
+                "authentication" => "failed",
+                "reason" => "bearer token unknown"
+            ];
+            echo_json($result);
+            exit();
+        }
+    }
+    
+    public function assertSSO($url=null) {
+        if (!$this->checkLogin()) {
+            # SSO login
+            #
+            require_once('/var/simplesamlphp/lib/_autoload.php');
+            $as = new \SimpleSAML\Auth\Simple('default-sp');
+            
+            if (stripos($url, ROOT_DIR) !== false)
+                $url = str_replace(ROOT_DIR, "", $url);
+            
+            $as->requireAuth(array(
+                'ReturnTo' => BASE_URL.ROOT_DIR.$url
+            ));
+            $attributes = $as->getAttributes();
+        }
+    }
+    
+    public function assertAdmin($url=null) {
+        if (!$this->checkLogin()) {
+            $this->assertSSO($url);
+        }
+        $as = new \SimpleSAML\Auth\Simple('default-sp');
+        if ($as->isAuthenticated()) {
+            $attributes = $as->getAttributes();
+            #$session = getSession();
+            #$session->log($attributes);
+            #print_r($attributes);
+            if (!$this->checkAdmin()) {
+                $session = getSession();
+                $session->smarty->display("403.tpl"); 
+                exit();
+            }
+        }
+    }
+    
+    public function isAdmin($uid) {
+        if (in_array(strtoupper($uid), array('C0707', '53698'))) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function checkAdmin() {
+        if ($this->checkLogin()) {
+            $attributes = $_SESSION["SSO"];
+            return $this->isAdmin($attributes["uid"][0]);;
+        }
+        return false;
+    }
+    
+    public function currentUID() {
+        if ($this->checkLogin()) {
+            $attributes = $_SESSION["SSO"];
+            return $attributes["uid"][0];
+        }
+        return false;
+    }
+    
+    public function redirect($url) {
+        if (strlen($url) > 0) {
+            $this->log("Redirect: {$url}");
+            header("Location:{$url}");
+            exit();
+        }
+    }
+    
+    public function checkMatricola($matricola) {
+        $operatore = $this->user();
+        
+        if ($operatore->admin()) {
+            $this->log("L'operatore {$operatore->uid()} e' ADMIN!");
+            return $matricola;
+        }
+        else {
+            $this->log("L'operatore {$operatore->uid()} NON e' ADMIN!");
+            return $operatore->matricola();
+        }
+    }
+    
+    
+    public function menu() {
+        $user = $this->user();
+        
+        $menu = array();
+        
+        if ($user->gruppo("WEBONLINE")) {
+            $menu[] = array(
+                "title" => "Procedure online",
+                "moduli" => array(
+                    "WOL" => array(
+                        "title" => "Analisi",
+                        "link" => "/webonline",
+                        "image" => "globe"
+                    ),
+                    
+                    // "WOLCONFIG" => array(
+                        // "title" => "Configurazioni",
+                        // "link" => "/webonline-config",
+                        // "image" => "gears"
+                    // )
+                )
+            );
+        }
+        
+        if ($user->gruppo("NAVIGAZIONE")) {
+            $menu[] = array(
+                "title" => "Navigazioni",
+                "moduli" => array(
+                    "NAV" => array(
+                        "title" => "Navigazioni",
+                        "link" => "/navigazione",
+                        "image" => "map signs"
+                    )
+                )
+            );
+        }
+        
+        /*if ($user->gruppo("REFTREE")) {
+            $menu[] = array(
+                "title" => "REFTREE",
+                "moduli" => array(
+                    
+                    "CONFIG" => array(
+                        "title" => "Configurazioni",
+                        "link" => "/wizard/config",
+                        "image" => ""
+                    )
+                )
+            );
+        }*/
+        
+        return $menu;
+    }
+}
