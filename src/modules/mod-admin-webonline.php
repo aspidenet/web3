@@ -32,14 +32,14 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) { #'/
     
     $sql = "SELECT v.label0 as categoria,
             p.code, p.sp, p.label0, p.tipo, p.help_lungo0
-            FROM MetaProcedure p
+            FROM Procedures p
             LEFT JOIN MetaVoci v ON p.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
             --WHERE (p.tipo='{$tipo}' OR '{$tipo}'='all')";
     $rs = $db->Execute($sql); 
     $record = $rs->GetRow();
     
     $tabulator_procedure = new Tabulator();
-    $tabulator_procedure->setSource($sql, null, "METAPROCEDURESLIST");
+    $tabulator_procedure->setSource($sql, null, "ProceduresSLIST");
     #$tabulator_procedure->setTitle("Colonne configurate");
 
     #$session->smarty()->assign("template", $template);
@@ -47,48 +47,6 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) { #'/
     $session->smarty()->display("admin-webonline-index.tpl");
     exit();
 });
-
-
-$this->respond('GET', '/old', function ($request, $response, $service, $app) {
-    GLOBAL $DBWM;
-    $db = getDB();
-    $session = getSession();
-    $smarty = $session->smarty();
-    
-    $pagina["indietro"] = "gestore_db.php";
-    $pagina["sezione"] = $pagina["tab"] = 'X'; #getVar("GET", 'tab', 'X');
-    $pagina["corrente"] = "procedure.php?tab=".$pagina["sezione"];
-
-    
-
-    //***************************************************************
-    # LEGGO TUTTE LE PROCEDURE DELLA SEZIONE
-    //***************************************************************
-    $strSQL = "SELECT p.*, v.label0 as label_categoria 
-                FROM MetaProcedure p
-                left join MetaVoci v ON v.code_voce=p.categoria
-                WHERE p.tipo='{$pagina["sezione"]}' 
-                ORDER BY p.Categoria, p.label0";
-    $rs = $db->Execute($strSQL);
-    //StampaErrore($rs, "Impossibile visualizzare la tabella ".$tabella."[$strSQL][".$db->ErrorMsg()."]", true);
-    if ($rs == FALSE) {
-        $descrizione = "Impossibile visualizzare la tabella delle procedure. [$strSQL][".$db->ErrorMsg()."]";
-      $link = $pagina["indietro"];
-
-    }
-
-    // Se non ci sono stati errori proseguiamo...
-    $elenco_procedure = array();
-
-    if ($rs != FALSE) {
-        $elenco_procedure = $rs->GetArray();
-    }
-    $smarty->assign('pagina', $pagina);
-    $smarty->assign('procedure', $elenco_procedure);
-
-    $smarty->display('webonline-procedure.tpl');
-});
-
 
 
 #
@@ -130,7 +88,7 @@ $this->respond('GET', '/procedure/?[:categoria]?/?[a:tipo]?', function ($request
     
 	// if ($operatore->superuser()) {
 		$sql = "SELECT s.*, v.label0 as label_categoria, v2.label0 as path_icona
-                FROM MetaProcedure s
+                FROM Procedures s
                 LEFT JOIN MetaVoci v ON s.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
                 LEFT JOIN MetaVoci v2 ON s.icona=v2.code_voce AND v2.code_tipologia='ICONE'
                 WHERE (s.tipo=? OR ?='all') AND (s.categoria=? OR ?='all')
@@ -138,7 +96,7 @@ $this->respond('GET', '/procedure/?[:categoria]?/?[a:tipo]?', function ($request
 	// }
 	// else {
 		// $sql = "SELECT p.*, v.label0 as label_categoria, v2.label0 as path_icona
-				// FROM MetaProcedure p 
+				// FROM Procedures p 
 				// JOIN Sys_Relazioni rel ON rel.code_figlio=p.code
 				// LEFT JOIN MetaVoci v ON p.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
 				// LEFT JOIN MetaVoci v2 ON p.icona=v2.code_voce AND v2.code_tipologia='ICONE'
@@ -212,7 +170,7 @@ $this->respond('GET', '/procedura/[:code]/?[procedura|parametri|auths:tab2]?', f
 
     
     $sql = "SELECT s.*, v.label0 as label_categoria, v2.label0 as path_icona
-            FROM MetaProcedure s
+            FROM Procedures s
             LEFT JOIN MetaVoci v ON s.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
             LEFT JOIN MetaVoci v2 ON s.icona=v2.code_voce AND v2.code_tipologia='ICONE'
             WHERE s.code=?";
@@ -225,7 +183,7 @@ $this->respond('GET', '/procedura/[:code]/?[procedura|parametri|auths:tab2]?', f
 
     
     
-    $template_code = "METAPROCEDURES";
+    $template_code = "ProceduresS";
     $record_code = $request->code;
     $tab2 = $request->tab2;
     $tab = $request->param("tab", "procedura") ;

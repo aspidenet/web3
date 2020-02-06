@@ -82,6 +82,7 @@ $this->respond('GET', APP_BASE_URL."/?", function ($request, $response, $service
     if (isset($_SESSION["NAVIGAZIONE"]["breadcrumbs"]))
         unset($_SESSION["NAVIGAZIONE"]["breadcrumbs"]);
 
+    $session->smarty->assign("HOMEPAGE", true);
     $session->smarty->display("index.tpl");
     #print_r($session->user());
     exit();

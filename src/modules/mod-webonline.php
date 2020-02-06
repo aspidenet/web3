@@ -55,7 +55,7 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
     unset($_SESSION[$MODULO_CODE]["breadcrumbs"]);
     
     $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria
-            FROM MetaProcedure p
+            FROM Procedures p
             LEFT JOIN MetaClassNodes v ON p.categoria=v.node_code AND v.classtype_code='WOLCATEG'
             WHERE (p.tipo=? OR ?='all') 
             ORDER BY v.sorting, v.label0";
@@ -81,7 +81,7 @@ $this->respond('GET', '/?[all|X|S|D|M:tipo]?', function ($request, $response, $s
     unset($_SESSION[$MODULO_CODE]["breadcrumbs"]);
     
     $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria, v.sorting, v.icon
-            FROM MetaProcedure p
+            FROM Procedures p
             LEFT JOIN MetaClassNodes v ON p.categoria=v.node_code AND v.classtype_code='WOLCATEG'
             WHERE (p.tipo=? OR ?='all') 
             ORDER BY v.sorting, v.label0";
@@ -103,6 +103,7 @@ $this->respond('GET', '/?[all|X|S|D|M:tipo]?', function ($request, $response, $s
     exit();
 });
 
+/*
 $this->respond('GET', '/tipo-[a:tipo]?', function ($request, $response, $service, $app) { #'/?[a:tipo]?'
     $session = getSession();
     $session->log("Webonline home");
@@ -122,7 +123,7 @@ $this->respond('GET', '/tipo-[a:tipo]?', function ($request, $response, $service
     
     // if ($operatore->amministratore()) {
         $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria
-                FROM dbo.MetaProcedure p
+                FROM dbo.Procedures p
                 LEFT JOIN MetaVoci v ON p.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
                 WHERE (p.tipo='{$tipo}' OR '{$tipo}'='all')
                 ORDER BY categoria";
@@ -130,14 +131,14 @@ $this->respond('GET', '/tipo-[a:tipo]?', function ($request, $response, $service
     // elseif ($operatore->superuser()) {
         // error_log("SUPERUSER");
         // $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria
-                // FROM dbo.MetaProcedure p
+                // FROM dbo.Procedures p
                 // LEFT JOIN MetaVoci v ON p.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
                 // WHERE (p.tipo='{$tipo}' OR '{$tipo}'='%')
                 // ORDER BY categoria";
     // }
     // else {
         // $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria
-                // FROM MetaProcedure p 
+                // FROM Procedures p 
                 // JOIN SYS_Relazioni rel ON rel.code_figlio=p.code
                 // JOIN MetaVoci v ON p.categoria=v.code_voce AND v.code_tipologia='PROCEDURE-CATEGORIE'
                 // WHERE (p.tipo='{$tipo}' OR '{$tipo}'='%')
@@ -157,7 +158,7 @@ $this->respond('GET', '/tipo-[a:tipo]?', function ($request, $response, $service
     $session->smarty()->display("webonline-categorie.tpl");
     exit();
 });
-
+*/
 
 #
 # PROCEDURE
@@ -183,7 +184,7 @@ $this->respond('GET', '/procedure/[:categoria]/?[a:tipo]?', function ($request, 
         $tipo = 'all';
     
     $sql = "SELECT s.*, v.label0 as label_categoria, v.icon
-            FROM MetaProcedure s
+            FROM Procedures s
             LEFT JOIN MetaClassNodes v ON s.categoria=v.node_code AND v.classtype_code='WOLCATEG'
             WHERE (s.tipo=? OR ?='all') AND (s.categoria=? OR ?='all')
             ORDER BY v.sorting, s.label0";
@@ -260,7 +261,7 @@ $this->respond('GET', '/procedura/[i:numero]', function ($request, $response, $s
 	$procedura = $_SESSION[$MODULO_CODE]["procedure"][$pnum];
 
 	$sql = "SELECT *
-            FROM MetaParams
+            FROM Params
             WHERE code_procedure=?
             ORDER BY sorting";
 	$rs = $db->Execute($sql, array($procedura["code"])) OR die($sql.$db->ErrorMsg());
@@ -752,137 +753,4 @@ $this->respond('GET', '/export/[xlsx|pdf|json:format]/?', function ($request, $r
         $writer->save("php://output");
     }*/
     exit();
-});
-
-
-
-
-
-#
-# PROCEDURA OLD - invio parametri ed esecuzione
-#
-$this->respond('POST', '/procedura-old/[i:numero]', function ($request, $response, $service, $app) {
-    $session = getSession();
-    $MODULO_CODE = $session->get("MODULO_CODE");
-    $pnum = $request->numero;
-    $db = getDB();
-    
-	$procedura = $_SESSION[$MODULO_CODE]["procedure"][$pnum];
-	$parametri = $_SESSION[$MODULO_CODE]["parametri"];
-    $numero_parametri = count($parametri);
-    $record_per_pagina = 100;
-    
-    $session->log($_POST);
-    
-    #-----------------------------------------------------------------------------
-	# RECORDSET A VIDEO
-	#-----------------------------------------------------------------------------
-    if ($procedura["funzione"])
-        $strSQL = "SELECT * FROM ".$procedura["codice"]."(";
-    else
-        $strSQL = $procedura["codice"]."  ";
-        
-	for ($i=0; $i<$numero_parametri; $i++) {
-		$input = get("param".$i);
-		$tipo = get("param{$i}_tipo"); #$parametri[$i]["tipo"]
-        
-        if ($parametri[$i]["ok_null"] == 'S')
-            $ok_null = true;
-        else
-            $ok_null = false;
-            
-        switch($tipo) {
-            case "integer":
-            case "decimal":
-                $strSQL .= write_number($input, $ok_null). ", ";
-                break;
-
-            case "char":
-            case "string":
-            case "datetime":
-            default:
-                $strSQL .= quote_string($input, $ok_null). ", ";
-                break;
-        }
-	}
-	$strSQL = substr($strSQL, 0, -2);
-    if ($procedura["funzione"])
-        $strSQL .= ")";
-        
-    echo $strSQL;
-    $rs = $db->Execute($strSQL);
-
-    
-    #-----------------------------------------------------------------------------
-    # TIPOLOGIA DATI COLONNE
-	#-----------------------------------------------------------------------------
-	$numfields = $rs->FieldCount();
-    $tipi_campi = array();
-    for ($f=0; $f<$numfields; $f++) {
-        $field = $rs->FetchField($f);
-        #print_r($field);
-        $nomecampo = strtolower($field->name);
-        
-        switch($field->type) {
-            case "int4":
-            case "int":
-            case "real":
-            case "numeric":
-            case "money":
-                $tipi_campi[$nomecampo] = "numero";
-                break;
-
-            case "timestamptz":
-            case "datetime":
-            case "datetime2":
-                $tipi_campi[$nomecampo] = "data";
-                break;
-
-            case "char":
-            case "varchar":
-                $tipi_campi[$nomecampo] = "stringa";
-                break;
-
-            default:
-                $tipi_campi[$nomecampo] = $field->type;
-                break;
-        }
-        #error_log($nomecampo."=".$tipi_campi[$nomecampo]);
-    }
-    #-----------------------------------------------------------------------------
-	
-	$_SESSION["SELECT"]["strSQL"] = $strSQL;
-	$_SESSION[$MODULO_CODE]["tipi_campi"] = $tipi_campi;
-	$_SESSION[$MODULO_CODE]["risultati"] = array();
-	if ($rs != FALSE) {
-        $session->log("RECORDS: ".$rs->RecordCount());
-		if ($rs->RecordCount() > 0)
-			$_SESSION[$MODULO_CODE]["risultati"] = $rs->GetArray();
-	}
-	else
-		echo $strSQL;
-
-	#$smarty->assign("numero_parametri", count($parametri));
-	$session->smarty()->assign("procedura", $procedura);
-	$session->smarty()->assign("parametri", $parametri);
-	$session->smarty()->assign("categoria", $categoria);
-	$session->smarty()->assign("tipi_campi", $_SESSION[$MODULO_CODE]["tipi_campi"]);
-	$session->smarty()->assign("records", array_slice($_SESSION[$MODULO_CODE]["risultati"], 0, $record_per_pagina));
-	$session->smarty()->assign("count", count($_SESSION[$MODULO_CODE]["risultati"]));
-	$session->smarty()->assign("pagine", ceil(count($_SESSION[$MODULO_CODE]["risultati"]) / $record_per_pagina));
-	$session->smarty()->assign("pagina", $pagina);
-	$session->smarty()->assign("X", new X());
-
-    $session->smarty()->display("webonline-risultati.tpl");
-    exit();
-});
-
-
-$this->respond('GET', '/info', function ($request, $response, $service, $app) {
-    echo "MOD WEB ONLINE<br>";
-    echo "URI: ".$request->uri()."<br>";
-    echo "PATHNAME: ".$request->pathname()."<br>";
-    echo "METHOD: ".$request->method()."<br>";
-    echo "-----------------------------------------------------------<br>";
-    
 });

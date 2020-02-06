@@ -3,16 +3,11 @@
 {block name="content"}
 
 <style>
-a {
-    color: black;
-}
-a:hover {
-    color: teal;
-}
+
 </style>
 
 
-<div id="wmmenu">
+<div id="wolmenu">
     
     <div class="ui pagination menu">
         <a class="{if $tipo == 'all'}active{/if} item" href="{$APP.url}/all" title="Tutte le procedure"><i class="globe icon"></i> Tutte</a>

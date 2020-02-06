@@ -391,6 +391,7 @@ $this->respond('GET', '/systemplates/[new|update|read:action]/[a:record_code]/?[
     
             $source = "SELECT * FROM ".$record["dbtable"];
             $sql = str_ireplace("SELECT", "SELECT TOP 1", $source);
+            $session->log("SQL: ".$sql);
             $rs = $db->Execute($sql);
             $source_colums = $rs->GetRow();
             foreach($source_colums as $key => $item) {
@@ -465,7 +466,7 @@ $this->respond('GET', '/procedures/[list:action]', function ($request, $response
     
     $tabulator = new Tabulator();
     #$tabulator->setSource($sql, null, "METAPROCEDURESLIST");
-    $tabulator->setRecordset("METAPROCEDURES");
+    $tabulator->setRecordset("METAPROCEDURE");
     #$tabulator->setTitle("Colonne configurate");
 
     #$session->smarty()->assign("template", $template);
@@ -479,7 +480,7 @@ $this->respond('GET', '/procedures/[list:action]', function ($request, $response
 #
 # PROCEDURES
 #
-$this->respond('GET', '/procedures/[new|update|read:action]/[a:record_code]/?[procedure|params:tabpage]?', function ($request, $response, $service, $app) {
+$this->respond('GET', '/[procedures|metaprocedures:template]/[new|update|read:action]/[a:record_code]/?[procedure|params:tabpage]?', function ($request, $response, $service, $app) {
     $session = getSession();
     $db = getDB();
     
