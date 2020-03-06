@@ -92,8 +92,11 @@ class Session {
         
         # TODO estrarre username dal token
         $decifrato = openssl_decipher($token);
+        $this->log("$token");
+        $this->log("$decifrato");
         $data = substr($decifrato, 0, 8);
         $username = substr($decifrato, 8, strlen($decifrato));
+        $this->log("$data $username");
         if (date("Ymd") != $data)
             return false;
         

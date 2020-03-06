@@ -15,8 +15,8 @@ $enabled_tables = array(
     // "MetaClassTypeAddFields",	
     // "MetaClassNodeAddFields",	
     // "MetaClassTemplates",
-    "MetaProcedure",	
-    "MetaParams",
+    "Procedures",	
+    "Params",
     // "MetaWizards",	
     "MetaTemplates",
     "MetaFields",	
@@ -30,7 +30,11 @@ $enabled_tables = array(
     // "Users",
     // "Groups",
     // "RelUserGroup",
-    // "RelUserRegistry"
+    // "RelUserRegistry",
+    "Menus",
+    "Visibilities",
+    "Profiles",
+    "Modules"
 );
 
 #
