@@ -9,14 +9,14 @@
 
 GLOBAL $enabled_tables;
 $enabled_tables = array(
-    "MetaClassTypes",
+    /*"MetaClassTypes",
     "MetaClassLevels",	
     "MetaClassNodes",	
     // "MetaClassTypeAddFields",	
     // "MetaClassNodeAddFields",	
     // "MetaClassTemplates",
-    "MetaProcedure",	
-    "MetaParams",
+    "Procedures",	
+    "Params",
     // "MetaWizards",	
     "MetaTemplates",
     "MetaFields",	
@@ -30,7 +30,11 @@ $enabled_tables = array(
     // "Users",
     // "Groups",
     // "RelUserGroup",
-    // "RelUserRegistry"
+    // "RelUserRegistry",*/
+    "Menus",
+    "Visibilities",
+    "Profiles",
+    "Modules"
 );
 
 #
@@ -65,6 +69,7 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
     // echo "SYNC INDEX";
     // print_r($enabled_tables);
     $differenze = array();
+    DEBUG($session->user()->username());
     
     foreach($enabled_tables as $table) {
         $source_table = array();
@@ -93,14 +98,26 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
         // print_r($pk);
         // echo "<br><br>";
         
+        
+        
+        $token = openssl_cipher(date("Ymd").$session->user()->username());
+        $authorization = "Authorization: Bearer {$token}";
+
         # Sorgente
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, SYNC_URL."/sys/sync/json/tables/{$table}");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization));
+        curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        if (strlen(PROXY))
+            curl_setopt($ch, CURLOPT_PROXY, PROXY);
         $output = curl_exec($ch);
         curl_close($ch); 
         
-        #echo $output."<br><br>";
+        echo $output."<br><br>";
         
         $result = json_decode($output, true);
         foreach ($result as $item) {
@@ -110,9 +127,9 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             }
             $source_table[$pkstring] = $item;
         }
-        // echo "<hr>";
-        // print_r($source_table);
-        // echo "<br><br>";
+        echo "<hr>";
+        print_r($source_table);
+        echo "<br><br>";
         
         
         # Destinazione
