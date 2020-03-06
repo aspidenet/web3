@@ -52,6 +52,9 @@ class Relation extends Base {
     #
     # DB FIELDS
     #
+    public function dbfieldCode() {
+        return $this->get("code_dbfield");
+    }
     public function dbfieldMaster() {
         return $this->get("master_dbfield");
     }

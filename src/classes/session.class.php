@@ -207,54 +207,62 @@ class Session {
     
     public function menu() {
         $user = $this->user();
+        $db = getDB();
+        
+        $sql = "SELECT DISTINCT m.link, m.icon, m.label0 as menu, m.menu_code, mo.module_code, mo.label0 as module
+                FROM Users u
+                JOIN RelUserProfile up ON u.username=up.user_code
+                JOIN RelProfileMenu pm ON pm.profile_code=up.profile_code
+                JOIN Profiles p ON p.profile_code=up.profile_code
+                JOIN Modules mo ON mo.module_code=p.module_code
+                JOIN Menus m ON m.menu_code=pm.menu_code
+                WHERE u.username=?";
+        $rs = $db->Execute($sql, array($user->username()));
+        $result = $rs->GetArray();
         
         $menu = array();
+        foreach($result as $item) {
+            $module_code = $item["module_code"];
+            $module = $item["module"];
+            $menu_code = $item["menu_code"];
+            
+            $menu[$module_code]["title"] = $module;
+            $menu[$module_code]["items"][$menu_code] = array(
+                "title" => $item["menu"],
+                "link" => $item["link"],
+                "image" => $item["icon"],
+            );
+        }
         
-        if ($user->gruppo("WEBONLINE")) {
-            $menu[] = array(
-                "title" => "Procedure online",
-                "moduli" => array(
-                    "WOL" => array(
-                        "title" => "Analisi",
-                        "link" => "/webonline",
-                        "image" => "globe"
-                    ),
-                    
-                    // "WOLCONFIG" => array(
-                        // "title" => "Configurazioni",
-                        // "link" => "/webonline-config",
-                        // "image" => "gears"
+        
+        
+        
+        // if ($user->gruppo("WEBONLINE")) {
+            // $menu[] = array(
+                // "title" => "Procedure online",
+                // "moduli" => array(
+                    // "WOL" => array(
+                        // "title" => "Analisi",
+                        // "link" => "/webonline",
+                        // "image" => "globe"
                     // )
-                )
-            );
-        }
+                // )
+            // );
+        // }
         
-        if ($user->gruppo("NAVIGAZIONE")) {
-            $menu[] = array(
-                "title" => "Navigazioni",
-                "moduli" => array(
-                    "NAV" => array(
-                        "title" => "Navigazioni",
-                        "link" => "/navigazione",
-                        "image" => "map signs"
-                    )
-                )
-            );
-        }
-        
-        /*if ($user->gruppo("REFTREE")) {
-            $menu[] = array(
-                "title" => "REFTREE",
-                "moduli" => array(
-                    
-                    "CONFIG" => array(
-                        "title" => "Configurazioni",
-                        "link" => "/wizard/config",
-                        "image" => ""
-                    )
-                )
-            );
-        }*/
+        // if ($user->gruppo("NAVIGAZIONE")) {
+            // $menu[] = array(
+                // "title" => "Navigazioni",
+                // "moduli" => array(
+                    // "NAV" => array(
+                        // "title" => "Navigazioni",
+                        // "link" => "/navigazione",
+                        // "image" => "map signs"
+                    // )
+                // )
+            // );
+        // }
+
         
         return $menu;
     }

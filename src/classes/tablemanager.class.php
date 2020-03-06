@@ -73,6 +73,10 @@ class TableManager implements \Serializable {
         $this->_customdata["table"] = $name;
     }
     
+    public function fields() {
+        return $this->_fields;
+    }
+    
     public function check($baserecord, $dbkey=null) {
         $session = getSession();
         #$session->log("TableManager::check() - START");

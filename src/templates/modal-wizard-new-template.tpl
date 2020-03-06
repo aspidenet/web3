@@ -111,31 +111,9 @@ $(document).ready(function() {
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+<div style="text-align:right;">
+    <div class="ui green save-modal-template button">
+        Prosegui <i class="angle right icon"></i>
+    </div>
+</div>

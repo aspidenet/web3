@@ -56,6 +56,7 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
     $session->smarty->assign("CUSTOM_CODE", get("CUSTOM_CODE", CUSTOM_CODE));
     $session->smarty->assign("CUSTOM_SOURCES", CUSTOM_SOURCES);
     $session->smarty->assign("REQUEST_URI", str_ireplace(ROOT_DIR.APP_BASE_URL, "", $request->pathname()));
+    $session->smarty->assign("REQUEST", $request);
     $session->smarty->assign("EMAIL_SUPPORT", EMAIL_SUPPORT);
     
     // $service->addValidator('SearchName', function ($str) {

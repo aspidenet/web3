@@ -34,17 +34,17 @@ $(function(){
 <center>
 
             
-	<table border="0" cellspacing="5" cellpadding="2">
-		<tr>
-			{foreach key="key" item="item" from=$configurazione}
-			<td class="ui segment panel_button"><a href="{$item.link}"><i class="{$item.icona} massive icon"></i><p>{$item.nome}</p></a></td>
-            {/foreach}
-		</tr>
-	</table>
 
 
-<br />
-<br />
+<div class="ui five column grid">
+    {foreach key="key" item="item" from=$configurazione}
+    <div class="column">
+        <div class="ui segment panel_button">
+            <a href="{$item.link}"><i class="{$item.icona} massive icon"></i><p>{$item.nome}</p></a>
+        </div>
+    </div>
+    {/foreach}
+</div>
 
 </center>
 <br />

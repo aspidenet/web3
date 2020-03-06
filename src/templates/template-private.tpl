@@ -75,7 +75,7 @@ function sync_submit(url, form_id, target_obj) {
     <div class="item">
         <div class="header">{$item.title}</div>
         <div class="menu">
-            {foreach name=moduli item=modulo key=codice from=$item.moduli}
+            {foreach name=moduli item=modulo key=codice from=$item.items}
             <a class="item" href="{$APP_BASE_URL}{$modulo.link}">
                 {$modulo.title}
                 <i class="{$modulo.image} icon"></i>

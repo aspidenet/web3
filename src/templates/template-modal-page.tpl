@@ -4,7 +4,6 @@
 {/block}
     
 {block name="content"}
-
 <script>
 $(document).ready(function() {
     

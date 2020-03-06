@@ -64,6 +64,26 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["icona"] = "sync alternate";
     $configurazione[$i]["link"] = APP_BASE_URL."/sys/sync/objects";
     
+    $i++;
+    $configurazione[$i]["nome"] = "Ruoli";
+    $configurazione[$i]["icona"] = "user tag";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/role/list";
+    
+    $i++;
+    $configurazione[$i]["nome"] = "Moduli";
+    $configurazione[$i]["icona"] = "sitemap";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/module/list";
+    
+    $i++;
+    $configurazione[$i]["nome"] = "Profili";
+    $configurazione[$i]["icona"] = "tasks";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/profile/list";
+    
+    $i++;
+    $configurazione[$i]["nome"] = "Menu";
+    $configurazione[$i]["icona"] = "sidebar";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/menu/list";
+    
     
     // $i++;
     // $configurazione[$i]["nome"] = "Procedure (via template wizard)";

@@ -83,9 +83,11 @@ $this->respond('GET', '/?[all|X|S|D|M:tipo]?', function ($request, $response, $s
     $sql = "SELECT DISTINCT p.categoria as code, v.label0 as categoria, v.sorting, v.icon
             FROM Procedures p
             LEFT JOIN MetaClassNodes v ON p.categoria=v.node_code AND v.classtype_code='WOLCATEG'
+            JOIN RelProfileProcedure pp ON pp.procedure_code=p.code
+            JOIN RelUserProfile up ON up.profile_code=pp.profile_code AND up.user_code=?
             WHERE (p.tipo=? OR ?='all') 
             ORDER BY v.sorting, v.label0";
-	$rs = $db->Execute($sql, array($tipo, $tipo));
+	$rs = $db->Execute($sql, array($session->user()->username(), $tipo, $tipo));
 
     $categorie = array();
 
@@ -186,9 +188,11 @@ $this->respond('GET', '/procedure/[:categoria]/?[a:tipo]?', function ($request, 
     $sql = "SELECT s.*, v.label0 as label_categoria, v.icon
             FROM Procedures s
             LEFT JOIN MetaClassNodes v ON s.categoria=v.node_code AND v.classtype_code='WOLCATEG'
+            JOIN RelProfileProcedure pp ON pp.procedure_code=s.code
+            JOIN RelUserProfile up ON up.profile_code=pp.profile_code AND up.user_code=?
             WHERE (s.tipo=? OR ?='all') AND (s.categoria=? OR ?='all')
             ORDER BY v.sorting, s.label0";
-	$rs = $db->Execute($sql, array($tipo, $tipo, $categoria, $categoria));
+	$rs = $db->Execute($sql, array($session->user()->username(), $tipo, $tipo, $categoria, $categoria));
 
 	$procedure = array();
 

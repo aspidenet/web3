@@ -73,6 +73,13 @@ class Template extends Base{
         return $this->get("icon");
     }
     
+    public function relations() {
+        $db = getDB();
+        $session = getSession();
+        $sql = "Select relation_code, label0 from metarelations where master_code=? order by sorting";
+        $rs = $db->Execute($sql, array($this->code()));
+        return $rs->GetArray();
+    }
     
     public function check($record, $action='I', $ignore_warnings=false) {
         $manager = TableManager::load($this->dbtable());  

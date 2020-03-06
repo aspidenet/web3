@@ -306,6 +306,7 @@ $this->respond('GET', '/systemplates/[list:action]', function ($request, $respon
     $session->smarty()->assign("tabulator_rscolumns", $tabulator_rscolumns);
 
     $session->smarty()->display("admin-config-templates-list.tpl");
+    exit();
 });
 
 
@@ -389,15 +390,32 @@ $this->respond('GET', '/systemplates/[new|update|read:action]/[a:record_code]/?[
             $tabulator_rscolumns->setSource($sql, array($record_code), "SYSFIELDS".$record_code);
             #$tabulator_rscolumns->setTitle("Colonne configurate");
     
-            $source = "SELECT * FROM ".$record["dbtable"];
-            $sql = str_ireplace("SELECT", "SELECT TOP 1", $source);
-            $session->log("SQL: ".$sql);
-            $rs = $db->Execute($sql);
-            $source_colums = $rs->GetRow();
-            foreach($source_colums as $key => $item) {
+            // $source = "SELECT * FROM ".$record["dbtable"];
+            // $sql = str_ireplace("SELECT", "SELECT TOP 1", $source);
+            // $session->log("SQL: ".$sql);
+            // $rs = $db->Execute($sql);
+            // $source_colums = $rs->GetRow();
+            // foreach($source_colums as $key => $item) {
+                // if (isset($columns[strtolower($key)])) 
+                    // unset($source_colums[$key]);
+            // }
+            
+            
+            $sql = "select *
+                    from information_schema.columns
+                    where table_name=?
+                    order by table_name, ordinal_position";
+            $rs = $db->Execute($sql, array($record["dbtable"]));
+            $source_colums_array = $rs->GetArray();
+            #$session->log($source_colums_array);
+            foreach($source_colums_array as $item) {
+                $key = $item["column_name"];
                 if (isset($columns[strtolower($key)])) 
                     unset($source_colums[$key]);
+                else
+                    $source_colums[$key] = $item;
             }
+
             
             $return_url = "/admin/config/systemplates/update/{$record_code}?tab=fields";
             
@@ -445,6 +463,8 @@ $this->respond('GET', '/systemplates/[new|update|read:action]/[a:record_code]/?[
             $session->smarty()->display("admin-config-templates.tpl");
             break;
     }
+    
+    exit();
 });
 
 
@@ -460,19 +480,20 @@ $this->respond('GET', '/procedures/[list:action]', function ($request, $response
     $db = getDB();
     
     $sql = "SELECT *
-            FROM MetaProcedure";
+            FROM Procedures";
     $rs = $db->Execute($sql);
     $record = $rs->GetRow();
     
     $tabulator = new Tabulator();
     #$tabulator->setSource($sql, null, "METAPROCEDURESLIST");
-    $tabulator->setRecordset("METAPROCEDURE");
+    $tabulator->setRecordset("METAPROCEDURES");
     #$tabulator->setTitle("Colonne configurate");
 
     #$session->smarty()->assign("template", $template);
     $session->smarty()->assign("tabulator_procedures", $tabulator);
 
     $session->smarty()->display("admin-config-procedures-list.tpl");
+    exit();
 });
 
 
@@ -493,7 +514,7 @@ $this->respond('GET', '/[procedures|metaprocedures:template]/[new|update|read:ac
     
     #
     $sql = "SELECT *
-            FROM MetaProcedure
+            FROM Procedures
             WHERE code=?";
     $rs = $db->Execute($sql, array($record_code));
     $record = $rs->GetRow();
@@ -530,4 +551,149 @@ $this->respond('GET', '/[procedures|metaprocedures:template]/[new|update|read:ac
             $session->smarty()->display("admin-config-procedures.tpl");
             break;
     }
+    exit();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+#****************************************************************************************************************************************************************************
+
+
+
+#
+#  TEMPLATE GENERICO LIST
+#
+$this->respond('GET', '/[:template_code]/[list:action]', function ($request, $response, $service, $app) {
+    $session = getSession();
+    $db = getDB();
+    
+    $template_code = $request->template_code;
+    $template = Template::load($template_code);
+    $recordset_code = $template->get("recordset_code");
+    
+    $tabulator = new Tabulator();
+    if (strlen($recordset_code) > 0) {
+        $tabulator->setRecordset($recordset_code);
+    }
+    else {
+        $sql = "SELECT * FROM {$template->dbview()}";
+        $tabulator->setSource($sql, null, md5($sql));
+    }
+
+    #$tabulator->setTitle("Colonne configurate");
+    $session->smarty()->assign("current_id", microtime());
+    $session->smarty()->assign("template", $template);
+    $session->smarty()->assign("tabulator", $tabulator);
+    $session->smarty()->display("admin-config-generic-list.tpl");
+});
+
+
+
+#
+# TEMPLATE GENERICO 
+#
+$this->respond('GET', '/[:template_code]/[new|update|read:action]/[a:record_code]/?[:tabpage]?', function ($request, $response, $service, $app) {
+    $session = getSession();
+    $db = getDB();
+    
+    $template_code = $request->template_code;
+    $record_code = $request->record_code;
+    $tabpage = $request->tabpage;
+    $tab = $request->param("tab", "template") ;
+    $action = $request->action;
+    $template = Template::load($template_code);
+    
+    #
+    $sql = "SELECT *
+            FROM {$template->dbview()}
+            WHERE {$template->dbkey()}=?";
+    $rs = $db->Execute($sql, array($record_code));
+    $record = $rs->GetRow();
+    
+    
+
+    $session->smarty()->assign("record_code", $record_code);
+    $session->smarty()->assign("action", $action);
+    $session->smarty()->assign("template", $template);
+    #$session->smarty()->assign("campi_record", $campi_record);
+    $session->smarty()->assign("record", $record);
+    $session->smarty()->assign("tab", $tab);
+    
+    switch($tabpage) {
+        case "":
+            $relations = $template->relations();
+            $session->smarty()->assign("relations", $relations);
+            $session->smarty()->display("admin-config-generic-update.tpl");
+            break;
+            
+        case "template":
+            #print_r($template);
+            $session->smarty()->display("admin-config-generic-template.tpl");
+            break;
+
+        case "auths":
+            $session->smarty()->display("admin-config-templates-auths.tpl");
+            break;
+            
+        default:
+        
+            $relation = new Relation($tabpage);
+            $recordset_code = $relation->get("recordset_code");
+        
+            $tabulator = new Tabulator();
+            
+            if (strlen($recordset_code) > 0) {
+                
+                $tabulator->setRecordset($recordset_code, "AND {$relation->dbfieldMaster()}=?", array($record_code));
+                
+            }
+            else {
+                $sql = "SELECT * FROM {$relation->dbview()} WHERE {$relation->dbfieldMaster()}=?";
+                $tabulator->setSource($sql, array($record_code), "RELATION".$record_code.md5(microtime()));
+            }
+            
+            $tabulator_name = "tab".md5(microtime());
+            // $rs = $db->Execute($sql, array($record_code));
+            // $columns = array();
+            // while(!$rs->EOF) {
+                // $row = $rs->GetRow();
+                // $key = strtolower($row["dbcolumn"]);
+                // $columns[$key] = $row;
+            // }
+            
+            // 
+            // #$tabulator->setTitle("Colonne configurate");
+    
+            $session->smarty()->assign("relation", $relation);
+            $session->smarty()->assign("tabulator", $tabulator);
+            $session->smarty()->assign("tabulator_name", $tabulator_name);
+            
+            $session->smarty()->display("admin-config-generic-relations.tpl");
+            break;
+    }
+    
+    exit();
 });

@@ -58,15 +58,18 @@ class Tabulator {
         $db = getDB();
         $sql2 = str_ireplace($from, "FROM", $sql);
         $rs = $db->Execute($sql2, $params);
-        
-        $fields = array();
-        $cols = $rs->fieldCount();
-        for($i=0;$i<$cols;$i++){
-            $fld = $rs->FetchField($i);
-            $fields[strtolower($fld->name)] = $fld;
+        $rows = array();
+        if ($rs && $rs->RecordCount() > 0) {
+            $rows = $rs->GetRow();
+            $fields = array();
+            $cols = $rs->fieldCount();
+            for($i=0;$i<$cols;$i++){
+                $fld = $rs->FetchField($i);
+                $fields[strtolower($fld->name)] = $fld;
+            }
         }
 
-        foreach($rs->GetRow() as $key => $item) {
+        foreach($rows as $key => $item) {
             $key = strtolower($key);
             if (!in_array($key, $exclude)) {
                 $formatter = "plaintext";

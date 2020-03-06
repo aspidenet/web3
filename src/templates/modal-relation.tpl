@@ -1,9 +1,16 @@
 {extends file="template-modal-page.tpl"}
 
-
-{block name="modal_actions"}
+{block name="modal_actions_footer"}
 {if $action == 'new'}
-<a class="ui blue button" onclick="modal_page_new('{$hashing}', '/modal/template/{$template->code()}/new', 'longer', reload{$hashing}Tabulator);"title="Crea un nuovo record perch&egrave; non presente in elenco">Nuovo</a>
+<a class="ui blue button" onclick="modal_page_new(
+        '{$hashing}', 
+        '/modal/template/{$template->code()}/new', 
+        'longer', 
+        reload{$hashing}Tabulator,
+        function() {
+            alert('nuovo');
+        }
+    );" title="Crea un nuovo record perch&egrave; non presente in elenco">Nuovo</a>
 <button class="ui green button" onclick="modal_relation_add_selected();" title="Associa i record selezionati">
     <i class="plus icon"></i> Associa
 </button> 
@@ -22,14 +29,14 @@
 <div id="tabulator_{$hashing}" style="margin: 3px;"></div>
 
 
-
-
-
 <script>
 var modal_relation_selected_{$hashing} = null;
-{$tabulator->display("tabulator_"|cat:$hashing, 0, 20, modal_relation_row_select, true)}
+var tabulator_{$hashing};
 
 $(document).ready(function() {
+
+    {$tabulator->display("tabulator_"|cat:$hashing, 0, 20, modal_relation_row_select, true)}
+
 });
 function reload{$hashing}Tabulator() {
     console.log("--- Reload tabulator_{$hashing} -----------------------");
@@ -50,11 +57,13 @@ function modal_relation_row_select(data, rows) {
 
 function modal_relation_add_selected() { 
     console.log("modal_relation_add_selected");
-    var selectedData = modal_relation_selected_{$hashing}; //$("#tabulator-table-{$hashing}").tabulator().getSelectedData();
+    var selectedData = modal_relation_selected_{$hashing}; 
     console.log("selectedData");
     console.log(selectedData);
-    if (selectedData.length == 0)
+    if (selectedData.length == 0) {
+        alert("Nessun elemento selezionato");
         return false;
+    }
     
     //return;
     $.ajax({
@@ -78,7 +87,6 @@ function modal_relation_add_selected() {
         else {
             var msg = JSON.parse(data);
             ShowMessage(msg, false, function() { 
-                //window.location = "{$APP_BASE_URL}/wizard/{$wizard_code}/list";
                 if (msg.result)
                     $(".ui.cancel.button").click();
             });
@@ -87,41 +95,8 @@ function modal_relation_add_selected() {
 }
 
 </script>
-
+MODAL RELATION {$REQUEST->uri()}
 
 
 
 {/block}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
