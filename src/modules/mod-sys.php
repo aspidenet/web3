@@ -69,7 +69,6 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
     // echo "SYNC INDEX";
     // print_r($enabled_tables);
     $differenze = array();
-    DEBUG($session->user()->username());
     
     foreach($enabled_tables as $table) {
         $source_table = array();
@@ -117,7 +116,7 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
         $output = curl_exec($ch);
         curl_close($ch); 
         
-        echo $output."<br><br>";
+        //echo $output."<br><br>";
         
         $result = json_decode($output, true);
         foreach ($result as $item) {
@@ -127,9 +126,9 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             }
             $source_table[$pkstring] = $item;
         }
-        echo "<hr>";
-        print_r($source_table);
-        echo "<br><br>";
+        // echo "<hr>";
+        // print_r($source_table);
+        // echo "<br><br>";
         
         
         # Destinazione
@@ -523,6 +522,7 @@ $this->respond('GET', '/sync/json/tables/[:table]', function ($request, $respons
     echo_json($rs->GetArray());
 });
 
+
 #
 #
 #
@@ -551,6 +551,69 @@ $this->respond('GET', '/sync/json/objects/[:object_name]', function ($request, $
     }
     
     echo_json($rs->GetArray());
+});
+
+
+#
+#
+#
+# SYNC IMPORT TABLES RECORD
+#
+#
+#
+
+$this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request, $response, $service, $app) {
+    GLOBAL $enabled_tables;
+    $session = getSession();
+    $db = getDb();
+    $table = $request->table;
+    $key = $request->key;
+    
+    if (!in_array($table, $enabled_tables))
+        exit("KO");
+    
+    $token = openssl_cipher(date("Ymd").$session->user()->username());
+    $authorization = "Authorization: Bearer {$token}";
+
+    # Sorgente
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, SYNC_URL."/sys/sync/json/tables/{$table}");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization));
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_VERBOSE, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    if (strlen(PROXY))
+        curl_setopt($ch, CURLOPT_PROXY, PROXY);
+    $output = curl_exec($ch);
+    curl_close($ch); 
+    
+    //echo $output."<br><br>";
+    
+    $result = json_decode($output, true);
+    $record = new Base();
+    
+    foreach ($result as $item) {
+        # Cerco il record che ha il codice voluto.
+        foreach($item as $k => $val) {
+            if ($val == $key) {
+                break 2;
+            }
+        }
+    }
+    # Lo trasformo in Record Base
+    foreach($item as $k => $val) {
+        $record->set($k, $val);
+    }
+    $manager = new TableManager($table);
+    try {
+        $manager->insert($record);
+        exit("OK");
+    }
+    catch(Excepion $ex) {
+        exit("KO");
+    }
 });
 
 

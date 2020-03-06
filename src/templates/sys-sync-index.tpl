@@ -4,6 +4,11 @@
 <script language="JavaScript" type="text/javascript">
 $(function(){
 });
+
+function importRecord(table, key) {
+    
+}
+
 </script>
 <style>
     p { padding-top: 12px; }
@@ -43,6 +48,13 @@ $(function(){
             {foreach key="col" item="value" from=$diff.new}
                 <td class="source_value">{$value}</td>
             {/foreach}
+                <td style="border:0px;"><button class="ui basic button" title="Importa record" type="button" 
+                    onclick="modal_page_new(
+                        '{$table|md5}{$key|md5}',
+                        '{$APP_BASE_URL}/sys/sync/import/tables/{$table}/{$key}',
+                        'large', 
+                        null
+                    )"><i class="icon download"></i></button></td>
             </tr>
             
             <tr>

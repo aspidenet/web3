@@ -161,8 +161,8 @@ class TableManager implements \Serializable {
         }
         $sql .= substr($columns_string, 0, -1).")";
         
-        #$session->log($sql);
-        #$session->log($columns_values);
+        // $session->log($sql);
+        // $session->log($columns_values);
         
         $db->Execute($sql, $columns_values);
         #$session->log("insert_Id(): ");
