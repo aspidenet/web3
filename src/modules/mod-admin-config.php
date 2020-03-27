@@ -32,7 +32,7 @@ $this->respond('GET', '/[users:template_code]/[list:action]', function ($request
     
     $template_code = "USER"; #$request->template_code;
     $template = Template::load($template_code);
-    $recordset_code = "USER"; #$template->get("recordset_code");
+    $recordset_code = $template->get("recordset_code");
     
     $tabulator = new Tabulator();
     if (strlen($recordset_code) > 0) {
@@ -47,6 +47,7 @@ $this->respond('GET', '/[users:template_code]/[list:action]', function ($request
     $session->smarty()->assign("template", $template);
     $session->smarty()->assign("tabulator", $tabulator);
     $session->smarty()->display("admin-config-users-list.tpl");
+    exit();
 });
 
 #
@@ -111,6 +112,7 @@ $this->respond('GET', '/users/[new|update|read:action]/[a:record_code]/?[user|re
             $session->smarty()->display("admin-config-users.tpl");
             break;
     }
+    exit();
 });
 
 

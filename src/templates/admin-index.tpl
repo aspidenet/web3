@@ -12,19 +12,9 @@ $(function(){
 {block name="content"}
 
 <style>
-	.panel_button {
-		text-align:center;
-		border: 0px solid white;
-		font-size:1.2em;
-		font-weight:bold;
-	}
-    a {
-        color: black;
-	}
-    a:hover {
-        color: teal;
-	}
-    p { padding-top: 12px; }
+
+    
+    .ui.cards > .card > .image { padding: 10px; }
 </style>
 
 <br />
@@ -33,18 +23,23 @@ $(function(){
 <br />
 <center>
 
-            
 
 
-<div class="ui five column grid">
+
+
+<div class="ui link five stackable cards">
     {foreach key="key" item="item" from=$configurazione}
-    <div class="column">
-        <div class="ui segment panel_button">
-            <a href="{$item.link}"><i class="{$item.icona} massive icon"></i><p>{$item.nome}</p></a>
+    <a class="card" href="{$item.link}">
+        <div class="image">
+            <i class="{$item.icona} huge icon"></i>
         </div>
-    </div>
+        <div class="content">
+            <div class="header">{$item.nome}</div>
+        </div>
+    </a>
     {/foreach}
 </div>
+
 
 </center>
 <br />

@@ -6,7 +6,29 @@ $(function(){
 });
 
 function importRecord(table, key) {
-    
+    $.ajax({
+        type: "GET",
+        url: '{$APP_BASE_URL}/sys/sync/import/tables/'+table+'/'+key,
+        success: function () {
+            console.log("success");
+        }
+    })
+    .done(function( data ) {
+        console.log(data);
+        //return false;
+        if (data == 'OK') {
+            $("#td_"+table+"_"+key).html('<i class="green large smile icon"></i>');
+        }
+        else if (data == 'KO') {
+            $("#td_"+table+"_"+key).html('<i class="red large angry icon"></i>');
+        }
+        else {
+            var msg = JSON.parse(data);
+            ShowMessage(msg, false, function() { 
+                return true;
+            });
+        }
+    });  
 }
 
 </script>
@@ -21,7 +43,7 @@ function importRecord(table, key) {
 
     {foreach name="t" key="table" item="item" from=$differenze}
     <h2>{$table}</h2>
-    
+    <div style="overflow-x: auto;">
         {foreach name="c" key="key" item="diff" from=$item}
         
             {if $smarty.foreach.c.first}<table class="" border="1">
@@ -48,13 +70,10 @@ function importRecord(table, key) {
             {foreach key="col" item="value" from=$diff.new}
                 <td class="source_value">{$value}</td>
             {/foreach}
-                <td style="border:0px;"><button class="ui basic button" title="Importa record" type="button" 
-                    onclick="modal_page_new(
-                        '{$table|md5}{$key|md5}',
-                        '{$APP_BASE_URL}/sys/sync/import/tables/{$table}/{$key}',
-                        'large', 
-                        null
-                    )"><i class="icon download"></i></button></td>
+                <td style="border:0px;" id="td_{$table}_{$key}">
+                    <button class="ui basic button" title="Importa record" type="button" 
+                            onclick="importRecord('{$table}', '{$key}');"><i class="icon download"></i></button>
+                </td>
             </tr>
             
             <tr>
@@ -70,6 +89,7 @@ function importRecord(table, key) {
         {foreachelse}
         <p>Nessuna differenza.</p>
         {/foreach}
+    </div>
     {/foreach}
 
 

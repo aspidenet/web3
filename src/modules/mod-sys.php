@@ -9,7 +9,7 @@
 
 GLOBAL $enabled_tables;
 $enabled_tables = array(
-    /*"MetaClassTypes",
+    "MetaClassTypes",
     "MetaClassLevels",	
     "MetaClassNodes",	
     // "MetaClassTypeAddFields",	
@@ -17,7 +17,7 @@ $enabled_tables = array(
     // "MetaClassTemplates",
     "Procedures",	
     "Params",
-    // "MetaWizards",	
+    "MetaWizards",	
     "MetaTemplates",
     "MetaFields",	
     "MetaRelations",
@@ -27,14 +27,15 @@ $enabled_tables = array(
     "Recordsets",
     "RecordsetColumns",
     // "Registries",
-    // "Users",
-    // "Groups",
-    // "RelUserGroup",
-    // "RelUserRegistry",*/
+    "Users",
+    "Groups",
+    "RelUserGroup",
+    "RelUserRegistry",
     "Menus",
     "Visibilities",
     "Profiles",
-    "Modules"
+    "Modules",
+    "Roles"
 );
 
 #
@@ -92,8 +93,8 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             // $primary_keys[$table] = $rs->get("COLUMN_NAME");
             // echo "primary_key: ".$primary_keys[$table]."<br><br>";
         }
-        else
-            DEBUG($sql." -> false");
+        // else
+            // DEBUG($sql." -> false");
         // print_r($pk);
         // echo "<br><br>";
         
@@ -124,6 +125,8 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             foreach($pk as $k) {
                 $pkstring .= $item[$k];
             }
+            if (isset($item['ident']))
+                unset($item['ident']);
             $source_table[$pkstring] = $item;
         }
         // echo "<hr>";
@@ -141,19 +144,20 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
                 foreach($pk as $k) {
                     $pkstring .= $item[$k];
                 }
+                if (isset($item['ident']))
+                    unset($item['ident']);
                 $target_table[$pkstring] = $item;
             }
             // echo "<hr>";
             // print_r($target_table);
             // echo "<br><br>";
         }
-        else
-            DEBUG($sql." -> false");
+        // else
+            // DEBUG($sql." -> false");
         
         
         # Differenze
         foreach ($source_table as $key =>$item) {
-            
             foreach($item as $col => $source_val) {
                 if (!isset($target_table[$key])) {
                     $differenze[$table][$key]['new'] = $item;
@@ -168,7 +172,6 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             }
         }
         foreach ($target_table as $key =>$item) {
-            
             foreach($item as $col => $target_val) {
                 if (!isset($source_table[$key])) {
                     $differenze[$table][$key]['old'] = $item;
@@ -568,6 +571,7 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
     $db = getDb();
     $table = $request->table;
     $key = $request->key;
+    $session->log("IMPORT: $table $key");
     
     if (!in_array($table, $enabled_tables))
         exit("KO");
@@ -590,24 +594,36 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
     curl_close($ch); 
     
     //echo $output."<br><br>";
+    #$session->log($output);
     
     $result = json_decode($output, true);
     $record = new Base();
+    $ok = false;
     
     foreach ($result as $item) {
         # Cerco il record che ha il codice voluto.
         foreach($item as $k => $val) {
-            if ($val == $key) {
+            if ($val === $key) {
+                
+                $session->log("$val == $key");
+                $session->log($item);
+                
+                # Lo trasformo in Record Base
+                foreach($item as $k => $val) {
+                    $record->set($k, $val);
+                }
+                $ok = true;
                 break 2;
             }
         }
     }
-    # Lo trasformo in Record Base
-    foreach($item as $k => $val) {
-        $record->set($k, $val);
-    }
+    
+    if (!$ok)
+        exit('KO');
+    
     $manager = new TableManager($table);
     try {
+        $session->log($record);
         $manager->insert($record);
         exit("OK");
     }

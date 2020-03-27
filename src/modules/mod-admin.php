@@ -84,6 +84,11 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["icona"] = "sidebar";
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/menu/list";
     
+    $i++;
+    $configurazione[$i]["nome"] = "Visibilità";
+    $configurazione[$i]["icona"] = "eye";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/visibility/list";
+    
     
     // $i++;
     // $configurazione[$i]["nome"] = "Procedure (via template wizard)";
