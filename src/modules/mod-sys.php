@@ -12,21 +12,21 @@ $enabled_tables = array(
     "MetaClassTypes",
     "MetaClassLevels",	
     "MetaClassNodes",	
-    // "MetaClassTypeAddFields",	
-    // "MetaClassNodeAddFields",	
-    // "MetaClassTemplates",
+    #// "MetaClassTypeAddFields",	
+    #// "MetaClassNodeAddFields",	
+    #// "MetaClassTemplates",
     "Procedures",	
     "Params",
     "MetaWizards",	
     "MetaTemplates",
     "MetaFields",	
     "MetaRelations",
-    // "Rules",
-    // "RuleDetails",	
-    // "MetaVoci",
+    #// "Rules",
+    #// "RuleDetails",	
+    #// "MetaVoci",
     "Recordsets",
     "RecordsetColumns",
-    // "Registries",
+    #// "Registries",
     "Users",
     "Groups",
     "RelUserGroup",
@@ -68,7 +68,7 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
     $session = getSession();
     $db = getDb();
     // echo "SYNC INDEX";
-    // print_r($enabled_tables);
+    // print_r($enabled_tables);exit('FINE');
     $differenze = array();
     
     foreach($enabled_tables as $table) {
@@ -112,8 +112,8 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        if (strlen(PROXY))
-            curl_setopt($ch, CURLOPT_PROXY, PROXY);
+        // if (strlen(PROXY))
+            // curl_setopt($ch, CURLOPT_PROXY, PROXY);
         $output = curl_exec($ch);
         curl_close($ch); 
         
@@ -407,6 +407,8 @@ $this->respond('POST', '/sync/objects/?[:object_name]?', function ($request, $re
     curl_setopt($ch, CURLOPT_VERBOSE, 1);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    // if (strlen(PROXY))
+        // curl_setopt($ch, CURLOPT_PROXY, PROXY);
     $output = curl_exec($ch);
     curl_close($ch); 
     
@@ -524,6 +526,39 @@ $this->respond('GET', '/sync/json/tables/[:table]', function ($request, $respons
     
     echo_json($rs->GetArray());
 });
+# JSON SYNC TABLES CONFIG - SINGLE KEY
+$this->respond('GET', '/sync/json/tables/[:table]/[:key]', function ($request, $response, $service, $app) {
+    GLOBAL $enabled_tables;
+    $session = getSession();
+    $db = getDb();
+    $table = $request->table;
+    $key = $request->key;
+    
+    
+    if (!in_array($table, $enabled_tables))
+        exit("KO");
+    
+    
+    # Gestiamo per ora chiavi di una sola colonna
+    $sql = "sp_pkeys '{$table}'";
+    $rs = $db->Execute($sql, array());
+    $pk = array();
+    if ($rs && $rs->RecordCount()) {
+        while (!$rs->EOF) {
+            $pk[] = $rs->get("COLUMN_NAME");
+            $rs->MoveNext();
+        }
+        // $primary_keys[$table] = $rs->get("COLUMN_NAME");
+        // echo "primary_key: ".$primary_keys[$table]."<br><br>";
+    }
+        
+        
+    
+    $sql = "SELECT * FROM {$table} WHERE {$pk[0]}=?";
+    $rs = $db->Execute($sql, array($key));
+    
+    echo_json($rs->GetArray());
+});
 
 
 #
@@ -588,8 +623,8 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
     curl_setopt($ch, CURLOPT_VERBOSE, 1);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    if (strlen(PROXY))
-        curl_setopt($ch, CURLOPT_PROXY, PROXY);
+    // if (strlen(PROXY))
+        // curl_setopt($ch, CURLOPT_PROXY, PROXY);
     $output = curl_exec($ch);
     curl_close($ch); 
     

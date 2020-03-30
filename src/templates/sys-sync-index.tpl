@@ -63,6 +63,8 @@ function importRecord(table, key) {
                     <th>{$col}</th>
                 {/foreach}
             {/foreach}
+            
+                <th rowspan="3" style="background:{$bgcell};">{$key}</th>
             </tr>
             
             
