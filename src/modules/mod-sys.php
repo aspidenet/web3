@@ -12,30 +12,30 @@ $enabled_tables = array(
     "MetaClassTypes",
     "MetaClassLevels",	
     "MetaClassNodes",	
-    #// "MetaClassTypeAddFields",	
-    #// "MetaClassNodeAddFields",	
-    #// "MetaClassTemplates",
-    "Procedures",	
-    "Params",
-    "MetaWizards",	
-    "MetaTemplates",
-    "MetaFields",	
-    "MetaRelations",
-    #// "Rules",
-    #// "RuleDetails",	
-    #// "MetaVoci",
-    "Recordsets",
-    "RecordsetColumns",
-    #// "Registries",
-    "Users",
-    "Groups",
-    "RelUserGroup",
-    "RelUserRegistry",
-    "Menus",
-    "Visibilities",
-    "Profiles",
-    "Modules",
-    "Roles"
+    // #// "MetaClassTypeAddFields",	
+    // #// "MetaClassNodeAddFields",	
+    // #// "MetaClassTemplates",
+    // "Procedures",	
+    // "Params",
+    // "MetaWizards",	
+    // "MetaTemplates",
+    // "MetaFields",	
+    // "MetaRelations",
+    // #// "Rules",
+    // #// "RuleDetails",	
+    // #// "MetaVoci",
+    // "Recordsets",
+    // "RecordsetColumns",
+    // #// "Registries",
+    // "Users",
+    // "Groups",
+    // "RelUserGroup",
+    // "RelUserRegistry",
+    // "Menus",
+    // "Visibilities",
+    // "Profiles",
+    // "Modules",
+    // "Roles"
 );
 
 #
@@ -123,15 +123,13 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
         foreach ($result as $item) {
             $pkstring = "";
             foreach($pk as $k) {
-                $pkstring .= $item[$k];
+                $pkstring .= $item[$k].'+';
             }
+            $pkstring = substr($pkstring, 0, -1);
             if (isset($item['ident']))
                 unset($item['ident']);
             $source_table[$pkstring] = $item;
         }
-        // echo "<hr>";
-        // print_r($source_table);
-        // echo "<br><br>";
         
         
         # Destinazione
@@ -142,15 +140,13 @@ $this->respond('GET', '/sync/tables/?', function ($request, $response, $service,
             foreach ($result as $item) {
                 $pkstring = "";
                 foreach($pk as $k) {
-                    $pkstring .= $item[$k];
+                    $pkstring .= $item[$k].'+';
                 }
+                $pkstring = substr($pkstring, 0, -1);
                 if (isset($item['ident']))
                     unset($item['ident']);
                 $target_table[$pkstring] = $item;
             }
-            // echo "<hr>";
-            // print_r($target_table);
-            // echo "<br><br>";
         }
         // else
             // DEBUG($sql." -> false");
@@ -534,28 +530,29 @@ $this->respond('GET', '/sync/json/tables/[:table]/[:key]', function ($request, $
     $table = $request->table;
     $key = $request->key;
     
-    
     if (!in_array($table, $enabled_tables))
         exit("KO");
     
-    
-    # Gestiamo per ora chiavi di una sola colonna
+    # Leggiamo le chiavi della tabella
     $sql = "sp_pkeys '{$table}'";
     $rs = $db->Execute($sql, array());
     $pk = array();
+    $pk_string = "";
     if ($rs && $rs->RecordCount()) {
         while (!$rs->EOF) {
-            $pk[] = $rs->get("COLUMN_NAME");
+            $colname = $rs->get("COLUMN_NAME");
+            $pk[] = $colname;
+            $pk_string .= " AND {$colname}=? ";
             $rs->MoveNext();
         }
         // $primary_keys[$table] = $rs->get("COLUMN_NAME");
         // echo "primary_key: ".$primary_keys[$table]."<br><br>";
     }
-        
-        
     
-    $sql = "SELECT * FROM {$table} WHERE {$pk[0]}=?";
-    $rs = $db->Execute($sql, array($key));
+    $keys = explode('+', $key);
+    
+    $sql = "SELECT * FROM {$table} WHERE 1=1 {$pk_string}";
+    $rs = $db->Execute($sql, array($keys));
     
     echo_json($rs->GetArray());
 });
@@ -616,7 +613,7 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
 
     # Sorgente
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, SYNC_URL."/sys/sync/json/tables/{$table}");
+    curl_setopt($ch, CURLOPT_URL, SYNC_URL."/sys/sync/json/tables/{$table}/{$key}");
     curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization));
     curl_setopt($ch, CURLOPT_HEADER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -631,30 +628,16 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
     //echo $output."<br><br>";
     #$session->log($output);
     
-    $result = json_decode($output, true);
+    $results = json_decode($output, true);
     $record = new Base();
-    $ok = false;
     
-    foreach ($result as $item) {
-        # Cerco il record che ha il codice voluto.
-        foreach($item as $k => $val) {
-            if ($val === $key) {
-                
-                $session->log("$val == $key");
-                $session->log($item);
-                
-                # Lo trasformo in Record Base
-                foreach($item as $k => $val) {
-                    $record->set($k, $val);
-                }
-                $ok = true;
-                break 2;
-            }
-        }
+    if (count($results) == 0)
+        exit("KO");
+    
+    # Lo trasformo in Record Base
+    foreach($results[0] as $k => $val) {
+        $record->set($k, $val);
     }
-    
-    if (!$ok)
-        exit('KO');
     
     $manager = new TableManager($table);
     try {

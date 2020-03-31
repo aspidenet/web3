@@ -55,7 +55,7 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/sysrecordsets/list";
     
     $i++;
-    $configurazione[$i]["nome"] = "Procedure";
+    $configurazione[$i]["nome"] = "Analisi";
     $configurazione[$i]["icona"] = "database";
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/procedures/list";
     

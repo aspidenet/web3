@@ -488,7 +488,7 @@ $this->respond('GET', '/procedures/[list:action]', function ($request, $response
     
     $tabulator = new Tabulator();
     #$tabulator->setSource($sql, null, "METAPROCEDURESLIST");
-    $tabulator->setRecordset("METAPROCEDURES");
+    $tabulator->setRecordset("METAPROCEDURE");
     #$tabulator->setTitle("Colonne configurate");
 
     #$session->smarty()->assign("template", $template);

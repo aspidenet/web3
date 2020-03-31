@@ -263,7 +263,7 @@ class DB {
 			return true;
         
         #$sql = str_ireplace("Consolidamento.", "Consolidamento_".CUSTOM_CODE.".", $sql);
-        $sql = str_ireplace("Consolidamento.", "Consolidamento_web3.", $sql);
+        #$sql = str_ireplace("Consolidamento.", "Consolidamento_web3.", $sql);
         
         
         try {
@@ -281,8 +281,10 @@ class DB {
         }
         catch (Exception $e)
         {   
-            error_log("--- SQL -------------------------------------------");  
+            error_log("--- SQL --------------------------------------------");  
             error_log($sql);   
+            error_log($params);   
+            error_log("----------------------------------------------------");  
             error_log($e->getMessage());   
             error_log("--- /SQL -------------------------------------------");  
             $this->last_error_code = $e->getCode();
