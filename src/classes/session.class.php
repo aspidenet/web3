@@ -92,13 +92,12 @@ class Session {
         
         # TODO estrarre username dal token
         $decifrato = openssl_decipher($token);
-        $this->log("$token");
-        $this->log("$decifrato");
         $data = substr($decifrato, 0, 8);
         $username = substr($decifrato, 8, strlen($decifrato));
-        $this->log("$data $username");
-        if (date("Ymd") != $data)
+        if (date("Ymd") != $data) {
+            error_log("Data non corrisponde a {$data}. Bearer check fallito!");
             return false;
+        }
         
         $sql = "SELECT username
                 FROM Users
@@ -107,6 +106,8 @@ class Session {
         
         if ($rs->RecordCount() == 1)
             return $username;
+        
+        error_log("Username {$username} inesistente o non attivo. Bearer check fallito!");
         return false;
     }
 
