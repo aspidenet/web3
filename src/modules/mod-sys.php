@@ -550,9 +550,11 @@ $this->respond('GET', '/sync/json/tables/[:table]/[:key]', function ($request, $
     }
     
     $keys = explode('+', $key);
+    if (!is_array($keys))
+        $keys = array($keys);
     
     $sql = "SELECT * FROM {$table} WHERE 1=1 {$pk_string}";
-    $rs = $db->Execute($sql, array($keys));
+    $rs = $db->Execute($sql, $keys);
     
     echo_json($rs->GetArray());
 });
