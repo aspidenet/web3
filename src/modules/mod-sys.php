@@ -24,8 +24,8 @@ $enabled_tables = array(
     // #// "Rules",
     // #// "RuleDetails",	
     // #// "MetaVoci",
-    // "Recordsets",
-    // "RecordsetColumns",
+    "Recordsets",
+    "RecordsetColumns",
     // #// "Registries",
     // "Users",
     // "Groups",
@@ -645,11 +645,11 @@ $this->respond('GET', '/sync/import/tables/[:table]/[:key]', function ($request,
     try {
         $session->log($record);
         $manager->insert($record);
-        exit("OK");
     }
     catch(Excepion $ex) {
         exit("KO");
     }
+    exit("OK");
 });
 
 

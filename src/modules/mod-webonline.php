@@ -278,6 +278,7 @@ $this->respond('GET', '/procedura/[i:numero]', function ($request, $response, $s
         $i=0;
         while (!$rs->EOF) {
             $row = $rs->GetRow();
+            $row["default_value"] = replace_dynamic_filters($row["default_value"]);
             $parametri[$i] = $row;
             
             
@@ -294,7 +295,7 @@ $this->respond('GET', '/procedura/[i:numero]', function ($request, $response, $s
                 # Procedura
                 # Vista/Tabella
                 if ($row["source_code"] != 'C')
-                    $sql = $row["source_code"];
+                    $sql = replace_dynamic_filters($row["source_code"]);
                 # Classificazione
                 else
                     $sql = $row["source_code"]; # TODO
@@ -434,6 +435,9 @@ $this->respond('POST', '/procedura/[i:numero]', function ($request, $response, $
     if ($rs != FALSE) {
         $elenco = $rs->GetArray();
     }
+    else
+        error_log("query fallita");
+    error_log("COUNT: ".$rs->RecordCount());
     #DEBUG($campi);
     #DEBUG($elenco[0]);
     $numfields = $rs->FieldCount();

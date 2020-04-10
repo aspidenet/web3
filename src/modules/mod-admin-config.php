@@ -142,6 +142,7 @@ $this->respond('GET', '/[sysrecordsets:template_code]/[list:action]', function (
     $session->smarty()->assign("template", $template);
     $session->smarty()->assign("tabulator", $tabulator);
     $session->smarty()->display("admin-config-sysrecordsets-list.tpl");
+    exit();
 });
 
 
@@ -247,6 +248,7 @@ $this->respond('GET', '/[sysrecordsets:template_code]/[new|update|read:action]/[
             $session->smarty()->display("admin-config-sysrecordsets.tpl");
             break;
     }
+    exit();
 });
 
 

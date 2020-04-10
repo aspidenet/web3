@@ -15,6 +15,7 @@ function importRecord(table, key) {
     })
     .done(function( data ) {
         console.log(data);
+        key = key.replace('+', '');
         //return false;
         if (data == 'OK') {
             $("#td_"+table+"_"+key).html('<i class="green large smile icon"></i>');
@@ -72,7 +73,7 @@ function importRecord(table, key) {
             {foreach key="col" item="value" from=$diff.new}
                 <td class="source_value">{$value}</td>
             {/foreach}
-                <td style="border:0px;" id="td_{$table}_{$key}">
+                <td style="border:0px;" id="td_{$table}_{$key|replace:'+':''}">
                     <button class="ui basic button" title="Importa record" type="button" 
                             onclick="importRecord('{$table}', '{$key}');"><i class="icon download"></i></button>
                 </td>

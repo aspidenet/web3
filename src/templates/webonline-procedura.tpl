@@ -153,7 +153,7 @@ $(document).ready(function() {
                                 <div class="default text">Tutti</div>
                                 <div class="menu">
                                     {foreach item="option" key="key_value" from=$parametro.select}
-                                    <div class="item" data-value="{$key_value}">{$option}</div>
+                                    <div class="item" data-value="{$key_value}">{$option.label}</div>
                                     {/foreach}
                                 </div>
                             </div>

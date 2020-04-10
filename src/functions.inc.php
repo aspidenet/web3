@@ -415,16 +415,16 @@ function check_filtro_dinamico($filtro) {
 ################################################################################
 # decodifica_filtri_dinamici:
 ################################################################################
-function decodifica_filtri_dinamici($parametro) {	
-    GLOBAL $session;
+function replace_dynamic_filters($text) {	
+    $session = getSession();
     
-    $parametro = str_replace(FILTRO_UTENTE, $session->user()->username(), $parametro);
-	// $parametro = str_replace(FILTRO_MATRICOLA, $matricola, $parametro);
-	// $parametro = str_replace(FILTRO_GRUPPO, $metautente->ou(), $parametro);
-	// $parametro = str_replace(FILTRO_ESERCIZIO, $applicazione->esercizio(), $parametro);
-	$parametro = str_replace("{OGGI}", date("d/m/Y"), $parametro);
+    $text = str_replace(FILTRO_UTENTE, $session->user()->username(), $text);
+	// $text = str_replace(FILTRO_MATRICOLA, $matricola, $text);
+	// $text = str_replace(FILTRO_GRUPPO, $metautente->ou(), $text);
+	// $text = str_replace(FILTRO_ESERCIZIO, $applicazione->esercizio(), $text);
+	$text = str_replace("{OGGI}", date("d/m/Y"), $text);
 
-	return $parametro;
+	return $text;
 }
 
 ################################################################################

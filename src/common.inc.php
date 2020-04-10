@@ -50,8 +50,6 @@ require_once "../src/classes/tabulator.class.php";
 # TEMP
 require_once "../src/classes/x.class.php";*/
 
-
-
 function my_autoload ($pClassName) {
     $custom_code = get("CUSTOM_CODE", CUSTOM_CODE);
     $filename = BASE_DIR."/../web3-{$custom_code}/src/classes/".strtolower($pClassName).".class.php";
