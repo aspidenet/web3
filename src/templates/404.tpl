@@ -22,6 +22,7 @@ $(document).ready(function() {
     </div-->
     <p>La risorsa richiesta non è disponibile: la pagina che stai cercando non esiste o è stata rimossa o il link che hai seguito contiene un errore.</p>
     <p><i>The requested resource could not be found.</i></p>
+    <p>Ritorna alla <a href="/">homepage</a></p>
   </div>
 </div>
 

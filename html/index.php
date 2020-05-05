@@ -21,10 +21,11 @@ try {
         
         if ($code >= 400 && $code < 500) {
             $session->smarty->display("404.tpl"); 
-            
-            
-        } elseif ($code >= 500 && $code <= 599) {
+            exit();
+        } 
+        elseif ($code >= 500 && $code <= 599) {
             error_log('uhhh, something bad happened');
+            $session->smarty->display("500.tpl"); 
         }
     });
 

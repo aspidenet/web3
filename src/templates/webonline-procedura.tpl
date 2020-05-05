@@ -2,7 +2,7 @@
 
 {block name="page_content"}
 
-<script type="text/javascript" src="http://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script>
+<!--script type="text/javascript" src="https://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script-->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.0.5/jspdf.plugin.autotable.js"></script>

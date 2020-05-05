@@ -82,9 +82,9 @@ $(document).ready(function() {
     
 
     //trigger download of data.xlsx file
-    $("#download-xlsx").click(function (e) {
+    /*$("#download-xlsx").click(function (e) {
         tabulator_webonline.download("xlsx", "webonline.xlsx", { sheetName:"WebOnline" });
-    });
+    });*/
     /*$("#download-xlsx").click(function (e) {
         e.stopPropagation();
         e.preventDefault();
