@@ -53,6 +53,7 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
     $session->smarty->assign("STATIC_URL", CURRENT_STATIC_URL);
     $session->smarty->assign("APPNAME", APPNAME);
     $session->smarty->assign("TEST", TEST);
+    $session->smarty->assign("RIBBON", RIBBON);
     $session->smarty->assign("CUSTOM_CODE", get("CUSTOM_CODE", CUSTOM_CODE));
     $session->smarty->assign("CUSTOM_SOURCES", CUSTOM_SOURCES);
     $session->smarty->assign("REQUEST_URI", str_ireplace(ROOT_DIR.APP_BASE_URL, "", $request->pathname()));
@@ -121,6 +122,7 @@ $this->respond('GET', APP_BASE_URL."/logout", function ($request, $response, $se
     // $decifrato = openssl_decipher($cifrato);
     // echo $decifrato."<br>";
 // });
+
 
 # crash
 $this->respond('GET', APP_BASE_URL."/crash", function ($request, $response, $service, $app) {

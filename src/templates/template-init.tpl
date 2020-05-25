@@ -15,19 +15,30 @@
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Open+Sans" rel="stylesheet"> 
     
+    {* FOMANTIC UI
     <link rel="stylesheet" type="text/css" href="{$STATIC_URL}/semantic-dist/semantic.min.css">
     <script src="{$STATIC_URL}/semantic-dist/semantic.min.js"></script>
+    *}
     
     <script src="{$STATIC_URL}/jquery-ui.min.js"></script>
     
-    <script type="text/javascript" src="{$STATIC_URL}/moment-with-locales.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.js"></script>
     
+    {* MOMENT
+    <script type="text/javascript" src="{$STATIC_URL}/moment-with-locales.min.js"></script>
+    *}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment-with-locales.min.js"></script>
+    
+    {* TABULATOR
     <link href="{$STATIC_URL}/tabulator-dist/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="{$STATIC_URL}/tabulator-dist/js/tabulator.min.js"></script>
     <script type="text/javascript" src="{$STATIC_URL}/tabulator-dist/js/jquery_wrapper.min.js"></script>
 
     <link href="{$STATIC_URL}/tabulator-dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
-    
+    *}
+    <link href="https://unpkg.com/tabulator-tables@4.1.4/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.4/dist/js/tabulator.min.js"></script>
     
 
     
@@ -56,6 +67,14 @@
                 onDeny : funcKO
               })
             .modal('show');
+    }
+    function navigate(href, newTab) {
+        var a = document.createElement('a');
+        a.href = href;
+        if (newTab) {
+            a.setAttribute('target', '_blank');
+        }
+        a.click();
     }
     
     $(document).ready(function() {

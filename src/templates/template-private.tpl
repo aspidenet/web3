@@ -8,7 +8,7 @@
 
 {block name="html_head_default_style"}
 <style type="text/css">
-
+.invisible { display: none !important; }
 </style>
 <script>
 $(document).ready(function() {
@@ -62,7 +62,7 @@ function sync_submit(url, form_id, target_obj) {
 <!-- Sidebar Menu -->
 <div class="ui {if $HOMEPAGE|default:false}visible{/if} vertical inverted black sidebar menu">
     <div style="padding:6px 3px; text-align:center;">
-        <img src="{$STATIC_URL}/img/logo_web3.png" style="height: 50px;"/>
+        <img src="{$STATIC_URL}/img/logo_sidebar.png" style="height: 50px;"/>
     </div>
     
     <br>
@@ -92,6 +92,7 @@ function sync_submit(url, form_id, target_obj) {
 
     <a class="item" href="{$APP_BASE_URL}/logout">Esci <i class="power icon"></i></a>
 </div>
+    {block name="custom_sidebars"}{/block}
 
 
 <div style="border-top: 0px solid teal; width:100%; z-index:99; position:absolute; bottom:0px;" id="content_bottom_limit"></div>
@@ -108,7 +109,7 @@ function sync_submit(url, form_id, target_obj) {
         
         
         {if $TEST}
-        <div role="alert" class="ribbon">TEST</div>
+        <div role="alert" class="ribbon">{$RIBBON}</div>
         {/if}       
         <header id="web3header">
             <div class="ui container masthead">
@@ -116,7 +117,7 @@ function sync_submit(url, form_id, target_obj) {
                 <div class="ui large secondary menu">
                     <a class="header-logo-link" href="/">
          
-                        <img src="{$STATIC_URL}/img/logo_web3.png" style="height: 70px;" />
+                        <img src="{$STATIC_URL}/img/logo_sidebar.png" style="height: 50px;" />
                     </a>
                     
                     <a class="left item" style="color:white; font-size:1.3em; font-weight:bold;">
