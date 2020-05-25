@@ -38,13 +38,13 @@ try {
     if (isset($custom_modules)) {
         foreach($custom_modules as $key =>$modulo) {
             if (is_array($modulo)) {
-                $klein->with(APP_BASE_URL."/{$key}", BASE_DIR."/../web3-{$custom_code}/src/modules/mod-{$key}.php");
+                $klein->with(APP_BASE_URL."/{$key}", CUSTOM_DIR."/src/modules/mod-{$key}.php");
                 foreach($modulo as $submodulo) {
-                    $klein->with(APP_BASE_URL."/{$key}/{$submodulo}", BASE_DIR."/../web3-{$custom_code}/src/modules/mod-{$key}-{$submodulo}.php");
+                    $klein->with(APP_BASE_URL."/{$key}/{$submodulo}", CUSTOM_DIR."/src/modules/mod-{$key}-{$submodulo}.php");
                 }
             }
             else {
-                $klein->with(APP_BASE_URL."/{$modulo}", BASE_DIR."/../web3-{$custom_code}/src/modules/mod-{$modulo}.php");
+                $klein->with(APP_BASE_URL."/{$modulo}", CUSTOM_DIR."/src/modules/mod-{$modulo}.php");
             }
         }
     }

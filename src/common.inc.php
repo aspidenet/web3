@@ -15,8 +15,8 @@ if (get("custom", "none", $_GET) != "none") {
     $_SESSION["CUSTOM_CODE"] = get("custom", "default", $_GET);
 }
 $custom_code = get("CUSTOM_CODE", CUSTOM_CODE);
-if (file_exists(BASE_DIR."/../web3-{$custom_code}/src/customs.inc.php")) {
-    require_once(BASE_DIR."/../web3-{$custom_code}/src/customs.inc.php");
+if (file_exists(CUSTOM_DIR."/src/customs.inc.php")) {
+    require_once(CUSTOM_DIR."/src/customs.inc.php");
 }
 if ($custom_code != "default" && CUSTOM_CODE == "default") {
     $_SESSION["DB_NAME"] = "web3_".$custom_code;

@@ -16,7 +16,7 @@ class Session {
         $this->smarty = new Smarty;
         $this->smarty->template_dir = array(
         
-            BASE_DIR."/../web3-".get("CUSTOM_CODE", CUSTOM_CODE)."/src/templates",
+            CUSTOM_DIR."/src/templates",
             BASE_DIR."/src/templates",
         );
         $this->smarty->compile_dir =  BASE_DIR."/templates_c";
