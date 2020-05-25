@@ -122,6 +122,7 @@ $this->respond('GET', APP_BASE_URL."/logout", function ($request, $response, $se
     // echo $decifrato."<br>";
 // });
 
+
 # crash
 $this->respond('GET', APP_BASE_URL."/crash", function ($request, $response, $service, $app) {
     throw new Exception("Error");

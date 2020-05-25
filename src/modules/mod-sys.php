@@ -57,6 +57,14 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     echo "SYS INDEX";
 });
 
+#
+# MD5
+#
+
+$this->respond('GET', '/md5/[:text]', function ($request, $response, $service, $app) {
+    echo "MD5: ".md5($request->text);
+});
+
 
 
 #
