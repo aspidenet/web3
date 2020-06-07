@@ -1,7 +1,7 @@
 <script>
 var {$tabulator_name};
 $(function(){
-    {$tabulator->display("{$tabulator_name}", "false", 15, "rowClick", false, '/admin/config/{$template->code()}/update-sorting')}
+    {$tabulator->display("{$tabulator_name}", "false", 15, "rowClick", false, '{$APP.url}/{$template->code()}/update-sorting')}
     
     
     
@@ -24,12 +24,12 @@ function rowClick(e, row) {
     );*/
 }
 function onHideRecordsetColumn() {
-    //var url = "/admin/config/sysrecordsets/update/{$record_code}?tab=columns";
+    //var url = "{$APP.url}/sysrecordsets/update/{$record_code}?tab=columns";
     //redirect(url);
 }
 function onApproveRecordsetColumn() {
     console.log('onApproveRecordsetColumn');
-    var url = "/admin/config/{$template->code()}/update/{$record_code}?tab={$relation->templateSlave()->code()}";
+    var url = "{$APP.url}/{$template->code()}/update/{$record_code}?tab={$relation->templateSlave()->code()}";
     redirect(url);
 }
 

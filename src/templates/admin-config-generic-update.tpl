@@ -7,7 +7,7 @@ $(function(){
         cache: false,
         evaluateScripts : true,
         auto    : true,
-        path    : '/admin/config/{$template->code()}/{$action}/{$record_code}',
+        path    : '{$APP.url}/{$template->code()}/{$action}/{$record_code}',
         ignoreFirstLoad: false,
         alwaysRefresh: true
     })
@@ -25,7 +25,7 @@ function refreshTab(name) {
 <div style="margin: 20px 0px;">
 
     <div style="text-align:right;">
-        <a class="ui grey button" href="{$APP_BASE_URL}/admin/config/{$template->code()}/list">Indietro</a>
+        <a class="ui grey button" href="{$APP_BASE_URL}{$APP.url}/{$template->code()}/list">Indietro</a>
     </div>
 
     <div class="ui header">GENERIC Template: <span class="ui orange">{$record_code|upper}</span></div>
@@ -35,7 +35,7 @@ function refreshTab(name) {
         {foreach item=item from=$template->relations()}
         <a class="item" data-tab="{$item.relation_code}">{$item.label0}</a>
         {/foreach}
-        <a class="item" data-tab="auths">Auths</a>
+        {*<a class="item" data-tab="auths">Auths</a>*}
     </div>
     
     <div class="ui bottom attached tab segment" data-tab="template">

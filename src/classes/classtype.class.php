@@ -23,13 +23,24 @@ class ClassType extends Base {
     
     public function nodes($parent='root') {
         $db = getDB();
-        $sql = "SELECT * FROM MetaClassNodes WHERE classtype_code=? AND parent_code=? ORDER BY sorting";
-        $rs = $db->Execute($sql, array($this->_fields["classtype_code"], $parent));
+        
+        if ($this->_fields["list"] == 'S') {
+            $sql = $this->_fields["query"];
+            $rs = $db->Execute($sql, array($this->_fields["classtype_code"], $parent));
+            $result_code = $this->_fields["result_code"];
+            $result_label = $this->_fields["result_label"];
+        }
+        else {
+            $sql = "SELECT * FROM MetaClassNodes WHERE classtype_code=? AND parent_code=? ORDER BY sorting";
+            $rs = $db->Execute($sql, array($this->_fields["classtype_code"], $parent));
+            $result_code = "node_code";
+            $result_label = "label0";
+        }
         $rows = $rs->GetArray();
         $nodes = array();
         foreach($rows as $item) {
-            $value = $item["node_code"];
-            $label = $item["label0"];
+            $value = $item[$result_code];
+            $label = $item[$result_label];
             $nodes[$value] = $label;
         }
         return $nodes;

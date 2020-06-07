@@ -8,19 +8,19 @@ $(function(){
 });
 function rowClick(e, row) {
     var code = row.getData()['{$template->dbkey()}'];
-    var url = '/admin/config/{$template->code()}/update/'+code;
+    var url = '{$APP.url}/{$template->code()}/update/'+code;
     //modal_popup_url(, onHideTemplateField);
     redirect(url);
 }
 function onHideTemplateField() {
-    var url = "/admin/config/{$template->code()}/list";
+    var url = "{$APP.url}/{$template->code()}/list";
     redirect(url);
 }
 function onHideTemplateNew() {
     
 }
 function onApproveTemplateNew() {
-    var url = "/admin/config/{$template->code()}/list";
+    var url = "{$APP.url}/{$template->code()}/list";
     redirect(url);
 }
 </script>
@@ -45,7 +45,7 @@ function onApproveTemplateNew() {
             
         </div>
         <div class="right aligned column">
-            <a class="ui grey button" href="{$APP_BASE_URL}/admin">Indietro</a>
+            <a class="ui grey button" href="{$APP.url}">Indietro</a>
         </div>
     </div>
     

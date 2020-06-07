@@ -14,11 +14,24 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
     $session = getSession();
 
     $MODULO_CODE = "ADMIN-CONFIG";
-
+    $APP = [
+        "title" => "Configurazioni di sistema",
+        "url" => APP_BASE_URL."/admin/config",
+        "code" => $MODULO_CODE
+    ];
+    $session->smarty()->assign("APP", $APP);
     $session->smarty()->assign("ADMINCONFIGPATH", ROOT_DIR.APP_BASE_URL."/admin/config");
     $session->save();
 });
 
+#
+#  INDEX
+#
+$this->respond('GET', '/?', function ($request, $response, $service, $app) {
+    $session = getSession();
+    $session->redirect(APP_BASE_URL."/admin");
+    exit();
+});   
 
 
 
@@ -404,12 +417,19 @@ $this->respond('GET', '/systemplates/[new|update|read:action]/[a:record_code]/?[
                     // unset($source_colums[$key]);
             // }
             
+            $dbtable = $record["dbtable"];
+            $dbsource = "";
+            $e = explode(".", $dbtable);
+            if (count($e) == 3) {
+                $dbtable = $e[2];
+                $dbsource = $e[0].".";
+            }
             
             $sql = "select *
-                    from information_schema.columns
+                    from {$dbsource}information_schema.columns
                     where table_name=?
                     order by table_name, ordinal_position";
-            $rs = $db->Execute($sql, array($record["dbtable"]));
+            $rs = $db->Execute($sql, array($dbtable));
             $source_colums_array = $rs->GetArray();
             #$session->log($source_colums_array);
             foreach($source_colums_array as $item) {

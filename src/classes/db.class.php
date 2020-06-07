@@ -281,15 +281,15 @@ class DB {
         }
         catch (Exception $e)
         {   
+            $session = getSession();
             error_log("--- SQL --------------------------------------------");  
             error_log($sql);   
-            error_log($params);   
+            $session->log($params);   
             error_log("----------------------------------------------------");  
             error_log($e->getMessage());   
             error_log("--- /SQL -------------------------------------------");  
             $this->last_error_code = $e->getCode();
             $this->last_error_message = $e->getMessage();
-            $session = getSession();
             $user = $session->user();
             if ($user->admin())
                 $ex = new Result(false, "KO", $e->getMessage(), Result::ERROR);

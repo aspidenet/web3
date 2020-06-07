@@ -18,22 +18,36 @@ class TableManager implements \Serializable {
         $db = getDB();
         $session = getSession();
         
-        $vals = explode(".", $table);
-        $lastid = count($vals);
-        $table = $vals[$lastid - 1];
+        // $vals = explode(".", $table);
+        // $lastid = count($vals);
+        // $table = $vals[$lastid - 1];
         
-        $sql = "sp_columns '{$table}'";
-        #$session->log($sql);
-        $rs = $db->Execute($sql);
+        // $sql = "sp_columns '{$table}'"; # NON PERMETTE DI LEGGERE UN DB DIVERSO DA QUELLO CORRENTE!
+        $dbtable = $table;
+        $dbsource = "";
+        $e = explode(".", $dbtable);
+        if (count($e) == 3) {
+            $dbtable = $e[2];
+            $dbsource = $e[0].".";
+        }
+        error_log("Da qui passo: ".$table);
+        
+        // Mi faccio dire le colonne della tabella da db
+        $sql = "select *
+                from {$dbsource}information_schema.columns
+                where table_name=?
+                order by table_name, ordinal_position";
+        $rs = $db->Execute($sql, array($dbtable));
         $rows = $rs->GetArray();
         
         foreach($rows as $row) {
             $this->_fields[] = [
                 "name" => $row["column_name"],
                 "type" => $row["type_name"],
-                "len" => intval($row["char_octet_length"]),
-                "null" => ($row["nullable"] == '1') ? true : false,
-                "ident" => (stripos($row["type_name"], 'identity') === false) ? false : true,
+                "len" => intval($row["character_octet_length"]),
+                "null" => ($row["is_nullable"] == 'NO') ? false : true,
+                #"ident" => (stripos($row["type_name"], 'identity') === false) ? false : true,
+                "ident" => ($row["column_name"] == 'ident') ? true : false,
                 "default" => $row["column_def"]
             ];
         }
