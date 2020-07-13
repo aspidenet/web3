@@ -82,37 +82,6 @@ function my_autoload ($pClassName) {
 $db = null; # oggetto DB
 
 
-#
-# SSO login
-#
-if (!isset($_SESSION["SSO"])) {
-    require_once('/var/www/simplesamlphp/lib/_autoload.php');
-    $as = new \SimpleSAML\Auth\Simple('default-sp');
-    // $as->requireAuth(array(
-        // 'ReturnTo' => BASE_URL.ROOT_DIR
-    // ));
-    if ($as->isAuthenticated()) {
-        $attributes = $as->getAttributes();
-        if (isset($attributes['urn:oid:0.9.2342.19200300.100.1.1']))
-            $attributes["uid"] = $attributes['urn:oid:0.9.2342.19200300.100.1.1'];
-        if (count($attributes) > 0)
-            $_SESSION["SSO"] = $attributes;
-        $session = getSession();
-        $session->log("==========================================================================");
-        $session->log($attributes);
-        // #print_r($attributes);
-        $session->log("==========================================================================");
-        $user = new User();
-        $user->load($attributes['urn:oid:0.9.2342.19200300.100.1.1'][0]); #uid
-        
-        #$_SESSION['USER'] = serialize($user);
-        #print_r($user);
-    }
-    
-    #$session->log($attributes);
-}
-else
-    error_log('SSO è settato');
 
 function url_exists($url) {
     $ch = @curl_init($url);
