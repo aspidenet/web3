@@ -60,7 +60,6 @@ $this->respond('POST', "/?", function ($request, $response, $service, $app) {
     }
 
     try {
-        $session->log("MD5 passwd: ".md5(trim($password)));
         $res = $user->login(trim($username), md5(trim($password)));
         if ($res) {
             if ($session->get("REDIRECT_URL_AFTER_LOGIN") === false) {

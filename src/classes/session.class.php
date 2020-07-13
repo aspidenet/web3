@@ -68,7 +68,7 @@ class Session {
     }
     
     public function checkLogin() {
-        if (isset($_SESSION['SSO']) || isset($_SESSION['USER']))
+        if (isset($_SESSION['USER']))
             return true;
         return false;
     }
@@ -133,7 +133,7 @@ class Session {
         if (!$this->checkLogin()) {
             # SSO login
             #
-            require_once('/var/simplesamlphp/lib/_autoload.php');
+            require_once('/var/www/simplesamlphp/lib/_autoload.php');
             $as = new \SimpleSAML\Auth\Simple('default-sp');
             
             if (stripos($url, ROOT_DIR) !== false)
@@ -213,7 +213,7 @@ class Session {
         $user = $this->user();
         $db = getDB();
         
-        $sql = "SELECT DISTINCT m.link, m.icon, m.label0 as menu, m.menu_code, mo.module_code, mo.label0 as module
+        $sql = "SELECT DISTINCT m.link, m.icon, m.label0 as menu, m.menu_code, COALESCE(m.module_code, mo.module_code) as module_code, mo.label0 as module
                 FROM Users u
                 JOIN RelUserProfile up ON u.username=up.user_code
                 JOIN RelProfileMenu pm ON pm.profile_code=up.profile_code
@@ -237,37 +237,7 @@ class Session {
                 "image" => $item["icon"],
             );
         }
-        
-        
-        
-        
-        // if ($user->gruppo("WEBONLINE")) {
-            // $menu[] = array(
-                // "title" => "Procedure online",
-                // "moduli" => array(
-                    // "WOL" => array(
-                        // "title" => "Analisi",
-                        // "link" => "/webonline",
-                        // "image" => "globe"
-                    // )
-                // )
-            // );
-        // }
-        
-        // if ($user->gruppo("NAVIGAZIONE")) {
-            // $menu[] = array(
-                // "title" => "Navigazioni",
-                // "moduli" => array(
-                    // "NAV" => array(
-                        // "title" => "Navigazioni",
-                        // "link" => "/navigazione",
-                        // "image" => "map signs"
-                    // )
-                // )
-            // );
-        // }
 
-        
         return $menu;
     }
 }

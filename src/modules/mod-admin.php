@@ -60,9 +60,9 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/procedures/list";
     
     $i++;
-    $configurazione[$i]["nome"] = "Sync";
-    $configurazione[$i]["icona"] = "sync alternate";
-    $configurazione[$i]["link"] = APP_BASE_URL."/sys/sync/objects";
+    $configurazione[$i]["nome"] = "Alberi e liste";
+    $configurazione[$i]["icona"] = "tree";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/classtype/list";
     
     $i++;
     $configurazione[$i]["nome"] = "Ruoli";
@@ -80,6 +80,11 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/profile/list";
     
     $i++;
+    $configurazione[$i]["nome"] = "Azioni";
+    $configurazione[$i]["icona"] = "award";
+    $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/action/list";
+    
+    $i++;
     $configurazione[$i]["nome"] = "Menu";
     $configurazione[$i]["icona"] = "sidebar";
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/menu/list";
@@ -88,6 +93,11 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
     $configurazione[$i]["nome"] = "VisibilitÃ ";
     $configurazione[$i]["icona"] = "eye";
     $configurazione[$i]["link"] = APP_BASE_URL."/admin/config/visibility/list";
+    
+    $i++;
+    $configurazione[$i]["nome"] = "Sync";
+    $configurazione[$i]["icona"] = "sync alternate";
+    $configurazione[$i]["link"] = APP_BASE_URL."/sys/sync/objects";
     
     
     // $i++;
@@ -159,7 +169,7 @@ $this->respond('GET', '/?', function ($request, $response, $service, $app) {
         // #print_r($index);
         
         // foreach($index as $key => $item) {
-            // # per ora andiamo oltre se lo step è completato
+            // # per ora andiamo oltre se lo step Ã¨ completato
             // if ($item["pass"] == true)
                 // continue;
             
@@ -215,7 +225,7 @@ $this->respond('POST', '/wizard/[:wizard]/[new|update|save:action]/[a:code]?', f
         #$session->log($index);
         
         foreach($index as $key => $item) {
-            # per ora andiamo oltre se lo step è completato
+            # per ora andiamo oltre se lo step Ã¨ completato
             if ($item["pass"] == true)
                 continue;
                 
@@ -251,7 +261,7 @@ $this->respond('POST', '/wizard/[:wizard]/[new|update|save:action]/[a:code]?', f
                 }
                 
                 # memorizziamo l'oggetto in memoria
-                $key2 = 0; # perché $item["list"] == false
+                $key2 = 0; # perchÃ© $item["list"] == false
                 $wizard->setIndexRecord($key, $key2, $record);
                 $wizard->setIndexPass($key, true);
                 $wizard->save();

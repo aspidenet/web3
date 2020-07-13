@@ -75,4 +75,3 @@ catch(Exception $ex) {
     $session->smarty->display("500.tpl"); 
     exit();
 }
-?>

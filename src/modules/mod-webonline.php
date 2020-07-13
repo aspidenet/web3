@@ -211,7 +211,7 @@ $this->respond('GET', '/procedure/[:categoria]/?[a:tipo]?', function ($request, 
                 $procedure[$i]["id"] = $rs->Fields("ident");
                 $procedure[$i]["code"] = $rs->Fields("code");
                 $procedure[$i]["tipo"] = $rs->Fields("tipo");
-                $procedure[$i]["codice"] = str_replace("VM_REFBUILDING_DB", "REFBUILDING_DB", $rs->Fields("sp"));
+                $procedure[$i]["codice"] = replace_dynamic_filters(str_replace("VM_REFBUILDING_DB", "REFBUILDING_DB", $rs->Fields("sp")));
                 $procedure[$i]["path_icona"] = $rs->Fields("icon");
                 $procedure[$i]["descrizione"] = $rs->Fields("label0");
                 $procedure[$i]["categoria"] = $rs->Fields("label_categoria");

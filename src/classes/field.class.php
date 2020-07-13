@@ -59,6 +59,9 @@ class Field extends Base {
         return $this->get("format_code");
     }
     
+    public function default() {
+        return $this->get("default_value");
+    }
     
     
     

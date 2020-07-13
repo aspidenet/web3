@@ -27,7 +27,9 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
             unset($_SESSION['SESSION']);
         $session = getSession();
     }
-    
+    $session->log("| ");
+    $session->log("| ");
+    $session->log("| ");
     $session->log("------------------------------------------------------");
     $session->log($request->method()." URI: ".$request->uri());
     #$session->log($request->method()." PATH: ".$request->pathname());
@@ -87,20 +89,22 @@ $this->respond('GET', APP_BASE_URL."/?", function ($request, $response, $service
     $session->smarty->assign("HOMEPAGE", true);
     $session->smarty->display("index.tpl");
     #print_r($session->user());
+    #print_r($_SESSION['USER']);
+    #print_r($_SESSION['SSO']);
     exit();
 });
 
 # LOGOUT
 $this->respond('GET', APP_BASE_URL."/logout", function ($request, $response, $service, $app) {
     error_log("FINE SESSIONE");
-    if (isset($_SESSION['SSO']))
-        unset($_SESSION['SSO']);
+    // if (isset($_SESSION['SSO']))
+        // unset($_SESSION['SSO']);
     if (isset($_SESSION['USER']))
         unset($_SESSION['USER']);
     if (isset($_SESSION['SESSION']))
         unset($_SESSION['SESSION']);
-    session_unset();
-    session_destroy();
+    // session_unset();
+    // session_destroy();
     $session = getSession();
     $session->redirect("/");
     exit();

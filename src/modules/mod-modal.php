@@ -388,13 +388,15 @@ $this->respond('GET', '/template/[:template_code_x]/[new|update|list:action]/?[:
 #
 # TEMPLATE new - POST
 #
-$this->respond('POST', '/template/[:template_code]/[new|update|list:action]/?[:code]?', function ($request, $response, $service, $app) {
+$this->respond('POST', '/template/[:code_template]/[new|update|list:action]/?[:code]?', function ($request, $response, $service, $app) {
     $db = getDB();
     $session = getSession();
     $action = $request->action;
     $code = $request->code;
-    $template_code = $request->template_code;
+    $template_code = $request->code_template;
     $result = new Result();
+    
+    $session->log("Template code: ".$template_code);
     
     $params = $request->params();
     $return_url = $request->param("return_url", "");
@@ -412,8 +414,10 @@ $this->respond('POST', '/template/[:template_code]/[new|update|list:action]/?[:c
     #$record->table($template->dbtable());
     $fields = $template->getFields();
     foreach($fields as $metafield) {
-        $value = get($metafield->dbfield(), "", $_POST);
-        $record->set($metafield->dbfield(), $value);
+        $dbfield = $metafield->dbfield();
+        #$session->log("dbfield = ".$dbfield);
+        $value = $request->param($dbfield, ""); #get($metafield->dbfield(), "", $_POST);
+        $record->set($dbfield, $value);
     }
     
     $session->log($record);
@@ -437,8 +441,10 @@ $this->respond('POST', '/template/[:template_code]/[new|update|list:action]/?[:c
     }
     
     try {
-        if (strlen($code) && $action == 'update')
+        if (strlen($code) && $action == 'update') {
+            error_log("*** UPDATE RECORD ***");
             $template->store($record, $code);
+        }
         elseif (strlen($code) && $action == 'delete') {
             error_log("*** DELETE RECORD ***");
             $template->delete($record, $code);

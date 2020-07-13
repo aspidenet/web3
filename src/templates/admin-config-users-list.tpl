@@ -2,8 +2,10 @@
 
 {block name="content"}
 <script>
+
+var tabulator_users;
 $(function(){
-    {$tabulator->display("tabulator", "false", null, "rowClick")}
+    {$tabulator->display("tabulator_users", "false", null, "rowClick")}
 });
 function rowClick(e, row) {
     var code = row.getData()['username'];
@@ -14,13 +16,18 @@ function rowClick(e, row) {
 function onHideTemplateField() {
     var url = "/admin/config/users/list";
     redirect(url);
+    //tabulator_users.setData();
 }
 function onHideTemplateNew() {
+    console.log("config-users-list::onHideTemplateNew()");
     
 }
 function onApproveTemplateNew() {
+    console.log("config-users-list::onApproveTemplateNew()");
     var url = "/admin/config/users/list";
     redirect(url);
+    //tabulator_users.setData();
+    return false;
 }
 </script>
 
@@ -54,7 +61,7 @@ function onApproveTemplateNew() {
 {* fine tastoni *}
 
 <div class="ui header">{$template->label()}</div>
-<div id="tabulator" style="margin: 3px;"></div>
+<div id="tabulator_users" style="margin: 3px;"></div>
 
 
 {/block}

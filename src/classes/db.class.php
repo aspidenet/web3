@@ -211,7 +211,7 @@ class DB {
 		$this->db_host = $host;
 		$this->db_user = decifra($user);
         
-        error_log("Mi collego a ".$this->db_name);
+        #error_log("Mi collego a ".$this->db_name);
 
 		// Creo la connessione:
 		$this->link = ADONewConnection($this->db_type);

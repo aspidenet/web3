@@ -76,9 +76,18 @@ class UI {
     
     ################################################
 	# Format
-	public function format($metafield, $value) {
+	public function format($metafield, $value, $placeholder="") {
+        if (strlen($value) == 0) {
+            echo $placeholder;
+            return;
+        }
+            
         switch($metafield->format()) {
         
+            case "DATE":
+                $date = new DateTime($value);
+                echo $date->format('d/m/Y');
+                break;
         
             case "TEXT":
             default:
@@ -96,10 +105,8 @@ class UI {
             // echo "<div class='{$num_name} fields'>";
         // }
         
-        
         echo "<div class='ui two column very compact stackable grid'>";
 
-        
         foreach($fieldsArray as $key => $metafield) {
         
             // echo "<div class='field' style='border: 1px solid red;'>";
@@ -138,7 +145,7 @@ class UI {
             }
             echo "</div>"; # fine row
         }
-        echo "</div>";
+        echo "</div>"; # fine grid
         
         // if ($num >= 2 || true) {
             // echo "</div>";
@@ -192,8 +199,13 @@ class UI {
             echo $this->format($metafield, $value);
             return;
         }
-        else
+        else {
+            // error_log("NO READONLY");
+            // error_log("DEFAULT: ".$metafield->default());
+            if (strlen($value) == 0 && strlen($metafield->default()) > 0)
+                $value = $metafield->default();
             $props["value"] = $value;
+        }
     
         if ($metafield->mandatory($action)) {
             $props["required"] = "required";

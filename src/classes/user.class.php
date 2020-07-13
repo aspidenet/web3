@@ -24,34 +24,18 @@ class User extends Meta {
         $session = getSession();
         $db = getDB();
         
-        if ($session->isAdmin($uid)) {
-            $this->set("uid", $uid);
-            $this->set("admin", true);
-            #return;
-        }
-        else
-            $this->set("admin", false);
-	}
-    
-
-	################################################
-	# LOGIN.
-	public function login($username, $password) {
-		$db = getDB();
-        $session = getSession();
-
         try {
             $sql = "SELECT *, u.ident as user_id, r.ident as registry_id  
                     FROM dbo.Registries r
                     RIGHT OUTER JOIN dbo.RelUserRegistry ur ON r.registry_code = ur.slave_code
                     RIGHT OUTER JOIN dbo.Users u ON ur.master_code = u.username 
                     WHERE flag_active='S'
-                    AND username=? AND password=?";
-            $rs = $db->Execute($sql, array($username, $password));
+                    AND username=?";
+            $rs = $db->Execute($sql, array($uid));
             
             $count = $rs->RecordCount();
             if ($count == 0)
-                throw new Exception("Login fallito o utente inesistente.");
+                throw new Exception("Utente {$uid} inesistente o non configurato.");
                 
             $row = $rs->GetRow();
             
@@ -62,10 +46,53 @@ class User extends Meta {
             $this->set("cognome", $row["person_surname"]);
             $this->set("admin", $row["flag_admin"]);
             
+            // Azioni
+            $sql = "SELECT DISTINCT a.action_code
+                    FROM Users u
+                    JOIN RelUserProfile up ON u.username=up.user_code
+                    JOIN RelProfileAction pa ON pa.profile_code=up.profile_code
+                    JOIN Actions a ON a.action_code=pa.action_code
+                    WHERE u.username=?";
+            $rs = $db->Execute($sql, array($uid));
+            $result = $rs->GetArray();
+            $actions = array();
+            foreach($result as $item) {
+                $actions[] = strtolower($item["action_code"]);
+            }
+            $this->set("actions", $actions);
+            
+            
             $_SESSION['USER'] = serialize($this);
             
             $rs->Close();
             return true;
+        }
+        catch(Exception $ex) {
+            $session->log("User::load: ".$ex->getMessage());
+            throw $ex;
+        }
+        return false;
+	}
+    
+
+	################################################
+	# LOGIN.
+	public function login($username, $password) {
+		$db = getDB();
+        $session = getSession();
+
+        try {
+            $sql = "SELECT *
+                    FROM dbo.Users 
+                    WHERE flag_active='S'
+                    AND username=? AND password=?";
+            $rs = $db->Execute($sql, array($username, $password));
+            
+            $count = $rs->RecordCount();
+            if ($count == 0)
+                throw new Exception("Login fallito o utente inesistente.");
+                
+            return $this->load($username);
         }
         catch(Exception $ex) {
             $session->log("User::login: ".$ex->getMessage());
@@ -131,5 +158,11 @@ class User extends Meta {
         
         return false;
 	}
-    
+    public function has($action) {
+        $actions = $this->get("actions");
+        if (in_array(strtolower($action), $actions)) { 
+            return true;
+        }
+        return false;
+    }
 }

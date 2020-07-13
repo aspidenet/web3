@@ -30,7 +30,7 @@ class TableManager implements \Serializable {
             $dbtable = $e[2];
             $dbsource = $e[0].".";
         }
-        error_log("Da qui passo: ".$table);
+        $session->log("TableManager::constructor({$table})");
         
         // Mi faccio dire le colonne della tabella da db
         $sql = "select *
@@ -43,12 +43,12 @@ class TableManager implements \Serializable {
         foreach($rows as $row) {
             $this->_fields[] = [
                 "name" => $row["column_name"],
-                "type" => $row["type_name"],
+                "type" => $row["data_type"],
                 "len" => intval($row["character_octet_length"]),
                 "null" => ($row["is_nullable"] == 'NO') ? false : true,
                 #"ident" => (stripos($row["type_name"], 'identity') === false) ? false : true,
                 "ident" => ($row["column_name"] == 'ident') ? true : false,
-                "default" => $row["column_def"]
+                "default" => $row["column_default"]
             ];
         }
         #$session->log("TableManager::_fields.");
@@ -175,8 +175,8 @@ class TableManager implements \Serializable {
         }
         $sql .= substr($columns_string, 0, -1).")";
         
-        // $session->log($sql);
-        // $session->log($columns_values);
+        $session->log("TableManager::insert(): ".$sql);
+        $session->log($columns_values);
         
         $db->Execute($sql, $columns_values);
         #$session->log("insert_Id(): ");
@@ -209,7 +209,7 @@ class TableManager implements \Serializable {
                 elseif (strlen($column["default"]))
                     $value = $column["default"];
                 else
-                    throw new Result(false, "KO", "Il campo '{$column["name"]}' &egrave; obbligatorio.", Result::ERROR);
+                    throw new Result(false, "KO", "Il campo '{$column["name"]}' è obbligatorio.", Result::ERROR);
             }
             else {
                 #$value = $rawval;
@@ -234,8 +234,8 @@ class TableManager implements \Serializable {
         $values[] = $baserecord->get($dbkey);
         
         try {
-            #$session->log($sql);
-            ##$session->log($values);
+            $session->log("TableManager::update(): ".$sql);
+            $session->log($keyvalue);
             $db->Execute($sql, array($keyvalue)); #, $values
             #$session->log("query eseguita");
         }
