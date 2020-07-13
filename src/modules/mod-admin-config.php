@@ -639,7 +639,7 @@ $this->respond('GET', '/[:template_code]/[list:action]', function ($request, $re
 #
 # TEMPLATE GENERICO 
 #
-$this->respond('GET', '/[:template_code]/[new|update|read:action]/[a:record_code]/?[:tabpage]?', function ($request, $response, $service, $app) {
+$this->respond('GET', '/[:template_code]/[new|update|read:action]/[:record_code]/[:tabpage]?', function ($request, $response, $service, $app) {
     $session = getSession();
     $db = getDB();
     
@@ -655,6 +655,11 @@ $this->respond('GET', '/[:template_code]/[new|update|read:action]/[a:record_code
             FROM {$template->dbview()}
             WHERE {$template->dbkey()}=?";
     $rs = $db->Execute($sql, array($record_code));
+    if ($rs == false || $rs->RecordCount() == 0) {
+        $session->smarty()->display("404.tpl");
+        exit();
+        
+    }
     $record = $rs->GetRow();
     
     

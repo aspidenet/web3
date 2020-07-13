@@ -46,11 +46,13 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
     // echo "<br><br>PARAMS:<br>";
     // print_r($passed_params);
     // echo "-----------------------------------------------------------<br>";
-    if (stripos($request->uri(), "/sync") === false) {
-        if (stripos($request->uri(), "/login") === false) {
-            $session->assertLogin($request->uri());
-        }
-    }
+    
+    // Ci sono parti pubbliche: ciascun modulo stabilirà se è sotto login o no e a quale livello
+    // if (stripos($request->uri(), "/sync") === false) {
+        // if (stripos($request->uri(), "/login") === false) {
+            // $session->assertLogin($request->uri());
+        // }
+    // }
     $session->smarty->assign("APP_BASE_URL", ROOT_DIR.APP_BASE_URL);
     $session->smarty->assign("STATIC_URL", CURRENT_STATIC_URL);
     $session->smarty->assign("APPNAME", APPNAME);
@@ -85,7 +87,11 @@ $this->respond('GET', APP_BASE_URL."/?", function ($request, $response, $service
     
     if (isset($_SESSION["NAVIGAZIONE"]["breadcrumbs"]))
         unset($_SESSION["NAVIGAZIONE"]["breadcrumbs"]);
-
+    
+    if (defined('ROOT_URL'))
+        if (strlen(ROOT_URL) > 0)
+            $session->redirect(ROOT_URL);
+        
     $session->smarty->assign("HOMEPAGE", true);
     $session->smarty->display("index.tpl");
     #print_r($session->user());

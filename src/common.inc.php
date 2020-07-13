@@ -11,11 +11,11 @@ setlocale(LC_ALL, "en_US.utf8");
 
 require_once "../src/customs.inc.php";
 require_once "../src/functions.inc.php";
+require_once(__DIR__."/functions-mail.inc.php");
 
 
 define('ADODB_ASSOC_CASE', 0);
 require_once "../vendor/autoload.php";
-// #require_once '../vendor/adodb/adodb-php/adodb-errorhandler.inc.php';
 require_once '../vendor/adodb/adodb-php/adodb-exceptions.inc.php';
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 
@@ -25,7 +25,7 @@ spl_autoload_register("my_autoload");
 
 
 /*
- * Customizzzioni
+ * Customizzazioni
  */
 
 if (get("custom", "none", $_GET) != "none") {
@@ -43,25 +43,12 @@ else
     define("CURRENT_STATIC_URL", STATIC_URL);
 
 
-/*require_once "../src/classes/session.class.php";
-require_once "../src/classes/db.class.php";
-require_once "../src/classes/meta.class.php";
-require_once "../src/classes/user.class.php";
-require_once "../src/classes/result.class.php";
 
-require_once "../src/classes/factory.class.php";
-require_once "../src/classes/base.class.php";
-require_once "../src/classes/field.class.php";
-require_once "../src/classes/template.class.php";
-require_once "../src/classes/wizard.class.php";
-require_once "../src/classes/relation.class.php";
-require_once "../src/classes/classtype.class.php";
-require_once "../src/classes/ui.class.php";
-require_once "../src/classes/html.class.php";
-require_once "../src/classes/tablemanager.class.php";
-require_once "../src/classes/tabulator.class.php";
-# TEMP
-require_once "../src/classes/x.class.php";*/
+
+
+
+
+
 
 function my_autoload ($pClassName) {
     $custom_code = get("CUSTOM_CODE", CUSTOM_CODE);

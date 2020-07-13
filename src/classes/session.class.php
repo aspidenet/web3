@@ -210,6 +210,9 @@ class Session {
     
     
     public function menu() {
+        if (!$this->checkLogin()) 
+            return false;
+        
         $user = $this->user();
         $db = getDB();
         
