@@ -27,9 +27,6 @@ $this->respond(array('GET', 'POST'), '*', function ($request, $response, $servic
             unset($_SESSION['SESSION']);
         $session = getSession();
     }
-    $session->log("| ");
-    $session->log("| ");
-    $session->log("| ");
     $session->log("------------------------------------------------------");
     $session->log($request->method()." URI: ".$request->uri());
     #$session->log($request->method()." PATH: ".$request->pathname());

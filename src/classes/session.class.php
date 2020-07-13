@@ -129,63 +129,13 @@ class Session {
         }
     }
     
-    public function assertSSO($url=null) {
-        if (!$this->checkLogin()) {
-            # SSO login
-            #
-            require_once('/var/www/simplesamlphp/lib/_autoload.php');
-            $as = new \SimpleSAML\Auth\Simple('default-sp');
-            
-            if (stripos($url, ROOT_DIR) !== false)
-                $url = str_replace(ROOT_DIR, "", $url);
-            
-            $as->requireAuth(array(
-                'ReturnTo' => BASE_URL.ROOT_DIR.$url
-            ));
-            $attributes = $as->getAttributes();
-        }
-    }
     
-    public function assertAdmin($url=null) {
-        if (!$this->checkLogin()) {
-            $this->assertSSO($url);
-        }
-        $as = new \SimpleSAML\Auth\Simple('default-sp');
-        if ($as->isAuthenticated()) {
-            $attributes = $as->getAttributes();
-            #$session = getSession();
-            #$session->log($attributes);
-            #print_r($attributes);
-            if (!$this->checkAdmin()) {
-                $session = getSession();
-                $session->smarty->display("403.tpl"); 
-                exit();
-            }
-        }
-    }
-    
-    public function isAdmin($uid) {
-        if (in_array(strtoupper($uid), array('C0707', '53698'))) {
-            return true;
-        }
-        return false;
-    }
-    
-    public function checkAdmin() {
-        if ($this->checkLogin()) {
-            $attributes = $_SESSION["SSO"];
-            return $this->isAdmin($attributes["uid"][0]);;
-        }
-        return false;
-    }
-    
-    public function currentUID() {
-        if ($this->checkLogin()) {
-            $attributes = $_SESSION["SSO"];
-            return $attributes["uid"][0];
-        }
-        return false;
-    }
+    // public function isAdmin($uid) {
+        // if (in_array(strtoupper($uid), array('C0707', '53698'))) {
+            // return true;
+        // }
+        // return false;
+    // }
     
     public function redirect($url) {
         if (strlen($url) > 0) {
@@ -195,18 +145,18 @@ class Session {
         }
     }
     
-    public function checkMatricola($matricola) {
-        $operatore = $this->user();
+    // public function checkMatricola($matricola) {
+        // $operatore = $this->user();
         
-        if ($operatore->admin()) {
-            $this->log("L'operatore {$operatore->uid()} e' ADMIN!");
-            return $matricola;
-        }
-        else {
-            $this->log("L'operatore {$operatore->uid()} NON e' ADMIN!");
-            return $operatore->matricola();
-        }
-    }
+        // if ($operatore->admin()) {
+            // $this->log("L'operatore {$operatore->uid()} e' ADMIN!");
+            // return $matricola;
+        // }
+        // else {
+            // $this->log("L'operatore {$operatore->uid()} NON e' ADMIN!");
+            // return $operatore->matricola();
+        // }
+    // }
     
     
     public function menu() {
